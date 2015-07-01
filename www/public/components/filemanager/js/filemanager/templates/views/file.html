@@ -1,0 +1,29 @@
+<div class="file" data-title="{{model.name}} {{model.modified}}">
+    <a>
+        {{#model.hasKnownType}}
+
+            {{#model.isLinkView}}
+            <span class="unknown-filetype glyphicon glyphicon-link"></span>
+            {{/model.isLinkView}}
+
+            {{^model.isLinkView}}
+
+                {{#model.isImageView}}
+                <img src="{{model.previewUrl}}" class="image-preview">
+                {{/model.isImageView}}
+
+                {{^model.isImageView}}
+                <span class="filetype {{model.extension}}"></span>
+                {{/model.isImageView}}
+
+            {{/model.isLinkView}}
+
+        {{/model.hasKnownType}}
+
+        {{^model.hasKnownType}}
+        <span class="unknown-filetype glyphicon glyphicon-file"></span>
+        {{/model.hasKnownType}}
+
+        <div class="title">{{model.name}}</div>
+    </a>
+</div>

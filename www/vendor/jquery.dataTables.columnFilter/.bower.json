@@ -1,0 +1,14 @@
+{
+  "name": "jquery.dataTables.columnFilter",
+  "_cacheHeaders": {
+    "ETag": "\"82//trunk/media/js/jquery.dataTables.columnFilter.js\"",
+    "Last-Modified": "Thu, 13 Mar 2014 20:43:57 GMT",
+    "Content-Length": "34508",
+    "Content-Type": "text/javascript"
+  },
+  "_release": "e-tag:82//trunk",
+  "main": "index.js",
+  "_source": "https://jquery-datatables-column-filter.googlecode.com/svn/trunk/media/js/jquery.dataTables.columnFilter.js",
+  "_target": "*",
+  "_originalSource": "https://jquery-datatables-column-filter.googlecode.com/svn/trunk/media/js/jquery.dataTables.columnFilter.js"
+}

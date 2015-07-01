@@ -1,0 +1,36 @@
+.flt { float: left;}
+.flt label { clear: left; display: block;}
+.clear_menu {clear: both; display: block;}
+
+table tbody tr.alt {
+  background-color: #f6f6f6;
+}
+
+table tbody tr.DragRow {
+    background-color: #ffe58d;
+    border: 1px double #ffcc8e;
+    cursor: move;
+}
+
+.dragHandle
+{
+    cursor: move;
+}
+
+td.move i
+{
+    cursor: move;
+}
+
+a.link
+{
+    text-decoration: underline;
+    font-weight: bold;
+    color: #1fb5ad;
+}
+
+a.link:hover
+{
+    color: #036B65;
+    text-decoration: none;
+}

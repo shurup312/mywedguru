@@ -1,0 +1,45 @@
+.pages_left
+{
+
+    float: left;
+    width: 19%;
+    border-right:1px solid #767676;
+
+}
+.pages_right{
+    float: right;
+
+    padding: 5px;
+    width: 80%;
+}
+.pages_left ul
+{
+    margin-left: 5px;
+    padding: 0px;
+}
+.pages_left ul li {
+    list-style: none;
+    list-style-position: inside;
+    cursor: pointer;
+    padding-left: 5px;
+    border-bottom: 1px solid white;
+
+
+}
+.pages_left ul li a {
+    font-size: 10px;
+    margin-left: 15px;
+    color: #1b7e5a;
+}
+.pages_left ul li span:hover {
+ border-bottom:1px solid #cde69c;
+}
+
+li span .showed_pages { display: none;
+    border-bottom:1px solid white;}
+
+li span:hover .showed_pages { display:inline-block; position: absolute; padding-left: 5px;}
+
+.flt { float: left;}
+.flt label { clear: left; display: block;}
+.clear_pages {clear: both; display: block;}

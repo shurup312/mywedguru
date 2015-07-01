@@ -1,0 +1,29 @@
+{
+  "name": "cloud",
+  "version": "0.0.1",
+  "description": "",
+  "author": "umax",
+  "main": "cloud-app.js",
+  "dependencies": {
+    "ampersand-app": "*",
+    "ampersand-router": "*",
+    "ampersand-view": "*",
+    "ampersand-view-switcher": "*",
+    "domready": "*",
+    "ampersand-model": "*",
+    "ampersand-rest-collection": "*",
+    "ampersand-dom": "*"
+  },
+  "devDependencies": {
+    "hogan.js": "^3.0.2",
+    "html-loader": "^0.3.0",
+    "loader-utils": "^0.2.7",
+    "mustache-loader": "^0.3.0",
+    "node-libs-browser": "^0.5.0",
+    "webpack": "^1.9.6"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "ISC"
+}
