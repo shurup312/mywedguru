@@ -7,6 +7,8 @@
  */
 namespace webapp\modules\auth\controllers;
 use Exception;
+use system\core\base\View;
+use system\core\socials\OK;
 use system\core\socials\VK;
 use webapp\modules\auth\forms\LoginForm;
 use webapp\modules\auth\services\PasswordRetrieveService;
@@ -74,133 +76,7 @@ class Controller extends \system\core\Controller
 				}
 			}
 		}
-		return $this->renderPartial('login.php', ['loginForm' => $loginForm]);
-	}
-
-	protected function actionRetrieve()
-	{
-		$this->app->html->setContent(['status' => 'pending']);
-		$this->app->html->setLayout('passretrieve');
-	}
-
-	protected function actionSendpass()
-	{
-		if ($_POST) {
-			$email = $_POST['email'];
-			if (!Validation::isEmail($email)) {
-				$this->app->html->setContent(
-					[
-						'message' => 'Введите корректный E-Mail',
-						'status'  => 'fail',
-						'email'   => $email
-					]
-				);
-				$this->app->html->setLayout('passretrieve');
-			} else {
-				$user = User::where('email', $email)
-							->findOne();
-				if ($user) {
-					$retrieveDP = new PasswordRetrieveService();
-					$retrieveDP->load(['email' => $email]);
-					$retrieveDP->getResults();
-					$this->app->html->setContent(
-						[
-							'message' => 'Письмо отравленно',
-							'status'  => 'success'
-						]
-					);
-					$this->app->html->setLayout('passretrieve');
-				} else {
-					$this->app->html->setContent(
-						[
-							'message' => 'Такой E-Mail не найден',
-							'status'  => 'fail',
-							'email'   => $email
-						]
-					);
-					$this->app->html->setLayout('passretrieve');
-				}
-			}
-		} else {
-			$this->redirect('/realty');
-		}
-	}
-
-	protected function actionCheck()
-	{
-		$token   = $_GET['t'];
-		$checkDP = new TokenCheckService();
-		$checkDP->load(['token' => $token]);
-		$user = $checkDP->getResults();
-		if ($user) {
-			$_SESSION['USER'] = [
-				'id'     => (int)$user->id,
-				'pid'    => (int)$user->pid,
-				'login'  => $user->login,
-				'email'  => $user->email,
-				'img'    => $user->img,
-				'code'   => $user->code,
-				'rights' => (int)$user->rights,
-				'msg'    => ""
-			];
-			$this->redirect('changepassword');
-		}
-	}
-
-	protected function actionChangepassword()
-	{
-		App::html()->left_menu = Menu::left();
-		if ($_POST) {
-			$newPass       = $_POST['new_password'];
-			$newPassRepeat = $_POST['new_password2'];
-			if ($newPass===$newPassRepeat) {
-				$currUser       = App::get('user');
-				$currUser->pass = md5($newPass);
-				$currUser->code = "";
-				$currUser->save();
-				$this->app->html->setContent(
-					$this->render(
-						'changepassword.php', [
-												'message' => 'Пароль успешно изменён',
-												'ok'      => true
-											]
-					)
-				);
-			} else {
-				$this->app->html->setContent($this->render('changepassword.php', ['message' => 'Введённые вами пароли не совпадают']));
-			}
-		} else {
-			$newPass = Tools::passGenerate(8, true);
-			if (isset($newPass) && !empty($newPass)) {
-				$currUser       = App::get('user');
-				$currUser->pass = md5($newPass);
-				$currUser->save();
-			}
-			$this->app->html->setContent($this->render('changepassword.php', ['genPass' => $newPass]));
-		}
-	}
-
-	protected function actionPassword()
-	{
-		App::html()->left_menu = Menu::left();
-		if ($_POST) {
-			$user                = App::get('user');
-			$realCurrentPassword = $user->pass;
-			$old_pass            = $_POST['old_password'];
-			$new_pass            = $_POST['new_password'];
-			$new_pass_repat      = $_POST['new_password2'];
-			if ($new_pass!=$new_pass_repat) {
-				$this->app->html->setContent($this->render('password.php', ['message' => 'Введённые вами пароли не совпадают']));
-			} elseif (md5($old_pass)!=$realCurrentPassword) {
-				$this->app->html->setContent($this->render('password.php', ['message' => 'Вы ввели неправильный пароль']));
-			} else {
-				$user->pass = md5($new_pass);
-				$user->save();
-				$this->app->html->setContent($this->render('password.php', ['ok' => 'ok']));
-			}
-		} else {
-			$this->app->html->setContent($this->render('password.php'));
-		}
+		return View::withoutDesign('login', ['loginForm' => $loginForm,]);
 	}
 
 	public function actionLogout()
@@ -249,28 +125,91 @@ class Controller extends \system\core\Controller
 		$this->redirect('/auth/registration');
 	}
 
+	public function actionOk()
+	{
+		if (App::request()
+			   ->get('error') || is_null(
+				App::request()
+				   ->get('code')
+			)
+		) {
+			$this->redirect(App::getConfig()['loginURL']);
+		}
+		$code     = App::request()
+					   ->get('code');
+		$config   = App::getConfig()['okAPI'];
+		$userData = OK::getUserToken($config, $code);
+		if (!isset($userData->access_token)) {
+			$this->redirect('/auth');
+		}
+		OK::setConfig($config);
+		$currentUser = OK::getCurrentUser($userData->access_token);
+		if(!isset($currentUser->uid)){
+			$this->redirect('/auth');
+		}
+		$user = User::factory()
+					->where('site', User::SITE_OK)
+					->where('socialid', $currentUser->uid)
+					->findOne();
+		if (!$user) {
+			$user    = User::create(
+				[
+					'site'     => User::SITE_OK,
+					'status'   => User::STATUS_SOCIAL_APPROVE,
+					'rights'   => User::USER_RIGHTS,
+					'socialid' => $currentUser->uid,
+					'token'    => $userData->refresh_token,
+				]
+			);
+			$isSaved = $user->save();
+			if (!$isSaved) {
+				throw new Exception('Не удалось сохранить пользователя.');
+			}
+		}
+		$_SESSION['USER']['id'] = $user->id;
+		$this->redirect('/auth/registration');
+	}
+
 	public function actionRegistration()
 	{
 		$userSocialID = App::get('user')->socialid;
 		if (!$userSocialID) {
 			$this->redirect('/auth');
 		}
-		$vk         = new VK;
-		$userVKData = $vk->setConfig(App::getConfig()['vkAPI'])
-						 ->getUserByID($userSocialID)[0];
-		$userExt = UserExtend::factory()
-							 ->where('user_id', App::get('user')->id)
-							 ->findOne();
+		$site         = $this->getSocialNetwork();
+		if(!$site){
+			$this->redirect('/auth');
+		}
+		$userData = $site->getUser($userSocialID);
+		$userExt    = UserExtend::factory()
+								->where('user_id', App::get('user')->id)
+								->findOne();
 		if (!$userExt) {
 			$userExt = UserExtend::create(
 				[
 					'user_id'    => App::get('user')->id,
-					'first_name' => $userVKData->first_name,
-					'last_name'  => $userVKData->last_name,
+					'first_name' => $userData->first_name,
+					'last_name'  => $userData->last_name,
 				]
 			);
-			$userExt->save();
 		}
+		$userExt->save();
+	}
+
+	private function getSocialNetwork()
+	{
+		$site = false;
+		switch(App::get('user')->site){
+			case User::SITE_VK:
+				$site = new VK();
+				VK::setConfig(App::getConfig()['vkAPI']);
+				break;
+			case User::SITE_OK:
+				$site = new OK();
+				OK::setConfig(App::getConfig()['okAPI']);
+				break;
+		}
+		return $site;
 	}
 }
 

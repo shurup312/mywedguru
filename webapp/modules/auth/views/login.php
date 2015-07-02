@@ -6,6 +6,7 @@
  * Time: 17:47
  */
 use system\core\App;
+use system\core\socials\OK;
 use system\core\socials\VK;
 use webapp\modules\adm\forms\LoginForm;
 
@@ -61,5 +62,6 @@ $loginForm->setTemplate('{element}');
 	</div>
 	<?= $loginForm->close(); ?>
 	<a href="<?=VK::getURLForAuth(App::getConfig()['vkAPI']);?>">Войти через ВК</a>
+	<a href="<?=OK::getURLForAuth(App::getConfig()['okAPI']);?>">Войти через OK</a>
 </body>
 </html>

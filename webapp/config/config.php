@@ -17,6 +17,14 @@ $projectConfig          = [
 		'responseURL'      => 'http://'.$_SERVER['HTTP_HOST'].'/auth/vk',
 		'SOMETEXT'      => 'mywed.guru',
 	],
+	'okAPI' => [
+		'APPID' => 1144440832,
+		'PERMISSIONS' => 'VALUABLE_ACCESS',
+		'PUBLIC_KEY' => 'CBAJMHDFEBABABABA',
+		'PRIVATE_KEY' => '5587F0FEA43628FECFE09738',
+		'URL' => 'http://www.odnoklassniki.ru/game/1144440832',
+		'redirectURL' => 'http://'.$_SERVER['HTTP_HOST'].'/auth/ok',
+	],
 	'defaultController' => false,
 		'loginURL'          => '/auth/',
 	'modules'           => [

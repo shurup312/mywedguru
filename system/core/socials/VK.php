@@ -13,17 +13,16 @@ use system\core\base\Object;
 class VK extends Object
 {
 
-	private $config;
+	private static $config;
 
 	/**
 	 * @param mixed $config
 	 *
 	 * @return $this
 	 */
-	public function setConfig($config)
+	public static function setConfig($config)
 	{
-		$this->config = $config;
-		return $this;
+		self::$config = $config;
 	}
 	public static function getURLForAuth($config)
 	{
@@ -37,12 +36,21 @@ class VK extends Object
 		return json_decode($userData);
 	}
 
-	public function getUserByID($userID)
+	/**
+	 * @param $userID
+	 *
+	 * @return SocialUser
+	 * @throws Exception
+	 */
+	public function getUser($userID)
 	{
 
 		$link = 'https://api.vk.com/method/users.get?user_ids='.$userID.'&fields=sex,bdate,city,country,photo_50,photo_100,photo_200_orig,photo_200,photo_400_orig,photo_max,photo_max_orig,photo_id,online,online_mobile,domain,has_mobile,contacts,connections,site,education,universities,schools,can_post,can_see_all_posts,can_see_audio,can_write_private_message,status,last_seen,relation,relatives,counters,screen_name,maiden_name,timezone,occupation,activities,interests,music,movies,tv,books,games,about,quotes,personal,friends_status';
-		$user = file_get_contents($link);
-		return $this->response($user);
+		$responseUser = $this->response(file_get_contents($link))[0];
+		$user = new SocialUser();
+		$user->first_name = $responseUser->first_name;
+		$user->last_name = $responseUser->last_name;
+		return $user;
 	}
 
 	private function response($data)
