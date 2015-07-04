@@ -7,8 +7,8 @@
  */
 use system\core\App;
 use system\core\ORM;
-define("_ROOT_PATH_", __DIR__);
-require __DIR__.DIRECTORY_SEPARATOR."system".DIRECTORY_SEPARATOR."boot.php";
+define("_ROOT_PATH_", dirname(__FILE__));
+require (dirname(__FILE__).DIRECTORY_SEPARATOR."system".DIRECTORY_SEPARATOR."boot.php");
 
 App::go();
 ORM::rawExecute("CREATE TABLE IF NOT EXISTS `migrate` (
