@@ -1,5 +1,6 @@
 <?php
 namespace webapp\modules\cabinet\models;
+
 /**
  * User: Oleg Prihodko
  * Mail: shuru@e-mind.ru
@@ -11,12 +12,12 @@ use system\core\Model;
 /**
  * Class UserExtend
  * @property integer id
- * @property string first_name
- * @property string last_name
- * @property string phone
+ * @property string  first_name
+ * @property string  last_name
+ * @property string  phone
  */
 class UserExtend extends Model
 {
-	protected static $table = 'user_extends';
 
+	protected static $table = 'user_extends';
 }
