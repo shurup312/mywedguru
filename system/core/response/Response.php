@@ -26,10 +26,15 @@ class Response extends Object
 		if(self::$format == self::JSON_FORMAT){
 			return ResponseJSON::run($content);
 		}
-		throw new Exception('Неверно указан формат вывода ');
+		throw new Exception('РќРµРІРµСЂРЅРѕ СѓРєР°Р·Р°РЅ С„РѕСЂРјР°С‚ РІС‹РІРѕРґР° ');
 	}
 
 	public function setFormat($format){
 		self::$format = $format;
+	}
+
+	public function redirect($url){
+		header('Location: '.$url);
+		die();
 	}
 }

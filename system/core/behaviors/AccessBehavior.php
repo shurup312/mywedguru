@@ -7,10 +7,10 @@
  */
 namespace system\core\behaviors;
 
-use system\core\App;
-use system\core\exceptions\NotAuthorizedException;
-use system\core\base\Behavior;
 use Exception;
+use system\core\App;
+use system\core\base\Behavior;
+use system\core\exceptions\NotAuthorizedException;
 
 class AccessBehavior extends Behavior
 {
@@ -27,6 +27,9 @@ class AccessBehavior extends Behavior
 		$this->checkCallback();
 		$this->checkRules();
 		$this->checkIP();
+		if($this->isAllow === false){
+			throw new NotAuthorizedException('Access denied', 403);
+		}
 	}
 
 	/**
@@ -36,11 +39,10 @@ class AccessBehavior extends Behavior
 	 */
 	private function checkListOnly()
 	{
-		if (!is_array($this->only)) {
-			throw new Exception('Параметр only в правилах доступа указан в формате отличном от массива.', 500);
-		}
-		$this->isAllow = true;
-		if ($this->only) {
+		if($this->only){
+			if (!is_array($this->only)) {
+				throw new Exception('Параметр only в правилах доступа указан в формате отличном от массива.', 500);
+			}
 			if (!in_array(
 				$this->getOwner()
 					 ->getAction(), $this->only
@@ -48,9 +50,7 @@ class AccessBehavior extends Behavior
 			) {
 				throw new NotAuthorizedException('Access denied', 403);
 			}
-			$this->isAllow = false;
 		}
-
 	}
 
 	private function checkRights()
@@ -100,11 +100,15 @@ class AccessBehavior extends Behavior
 				return true;
 			}
 		}
-		if (!$this->checkRuleRights($rule)){
-			throw new NotAuthorizedException('Access denied', 403);
+
+		if(is_null($this->isAllow)){
+			$this->isAllow = false;
 		}
-		if(!$this->checkRuleCallback($rule)) {
-			throw new NotAuthorizedException('Access denied', 403);
+		if ($this->checkRuleRights($rule)){
+			$this->isAllow = true;
+		}
+		if($this->checkRuleCallback($rule)) {
+			$this->isAllow = true;
 		}
 	}
 
@@ -133,7 +137,6 @@ class AccessBehavior extends Behavior
 		if(is_null($this->callback)){
 			return true;
 		}
-
 		if(!call_user_func($this->callback)){
 			throw new NotAuthorizedException('Access denied', 403);
 		}
@@ -148,7 +151,7 @@ class AccessBehavior extends Behavior
 	 */
 	private function checkRuleRights($rule)
 	{
-		$isAllow = true;
+		$isAllow = false;
 		if(!isset($rule['rights'])){
 			return $isAllow;
 		}
@@ -172,9 +175,8 @@ class AccessBehavior extends Behavior
 	 */
 	private function checkRuleCallback($rule)
 	{
-		$isAllow = true;
 		if(!isset($rule['callback'])){
-			return $isAllow;
+			return false;
 		}
 		$isAllow = call_user_func($rule['callback']);
 		return $isAllow;

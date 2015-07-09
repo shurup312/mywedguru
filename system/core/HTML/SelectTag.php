@@ -1,9 +1,9 @@
 <?php
 /**
- * User: FomalhautRed
- * Mail: demirurg@gmail.com
- * Date: 15.05.2015
- * Time: 13:26
+ * User: Oleg Prihodko
+ * Mail: shuru@e-mind.ru
+ * Date: 08.05.15
+ * Time: 14:13
  */
 namespace system\core\HTML;
 
@@ -21,29 +21,25 @@ class SelectTag extends Tag
 	public function run($attributes, $content = false)
 	{
 		$value = '';
+		$options = $attributes['options'];
+		unset($attributes['options']);
 		if(isset($attributes['value'])){
-			$selected = $attributes['value'];
-			$values = $attributes['values'];
+			$value = $attributes['value'];
 			unset($attributes['value']);
-			unset($attributes['values']);
-			$options = $this->makeOptsList($values, $selected);
 		}
-		return "<select ".$this->generateAttributes($attributes).' class="form-control">'.$options.'</select>';
+		return "<select ".$this->generateAttributes($attributes).'>'.$this->getOptions($options, $value).'</select>';
 	}
 
-	private function makeOptsList($options, $selected)
+	private function getOptions($options, $selectedValue)
 	{
-		$html = '';
-		foreach($options as $opt)
-		{
-			$selectedAttr = '';
-			if($opt['value'] == $selected)
-			{
-				$selectedAttr = 'selected';
+		$result = '';
+		foreach ($options as $value=>$text) {
+			$attributes = ['value' => $value];
+			if($selectedValue == $value){
+				$attributes['selected'] = 'selected';
 			}
-			$html .= '<option value="'.$opt['value'].'" '.$selectedAttr.'>'.$opt['name'].'</option>';
+			$result.= (new OptionTag())->run($attributes, $text);
 		}
-		return $html;
+		return $result;
 	}
 }
-?>

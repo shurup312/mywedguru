@@ -3,6 +3,7 @@ namespace system\core\base;
 
 class Request
 {
+
 	public function isAjax()
 	{
 		if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
@@ -29,10 +30,31 @@ class Request
 		if(!$name){
 			return $_POST;
 		}
-		if(!$_POST[$name]){
+		if(!isset($_POST[$name])){
 			return null;
 		}
 		return $_POST[$name];
+	}
+
+	public function files($name = false)
+	{
+		if(!$name){
+			return $_FILES;
+		}
+		if(!isset($_FILES[$name])){
+			return null;
+		}
+		return $_FILES[$name];
+	}
+
+	public function raw()
+	{
+		return file_get_contents('php://input');
+	}
+
+	public function requestMethod()
+	{
+		return $_SERVER['REQUEST_METHOD'];
 	}
 }
  

@@ -17,7 +17,7 @@ class UserForm extends Form
 		return [
 			'first_name'   => [
 				'type'       => InputTag::className(),
-				'label'      => 'Фамилия',
+				'label'      => 'Имя',
 				'attributes' => [
 					'type'      => 'text',
 					'name'      => 'first_name',

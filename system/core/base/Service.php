@@ -57,7 +57,10 @@ abstract class Service {
 
 	/**
 	 * Задание значений свойств сервиса
+	 *
 	 * @param array $array
+	 *
+	 * @return $this
 	 */
 	public function load(array $array)
 	{
@@ -68,5 +71,6 @@ abstract class Service {
 				$this->{$property->name} = $array[$property->name];
 			}
 		}
+		return $this;
 	}
 }

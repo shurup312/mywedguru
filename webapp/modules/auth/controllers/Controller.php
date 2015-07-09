@@ -8,48 +8,32 @@
 namespace webapp\modules\auth\controllers;
 use Exception;
 use system\core\base\View;
+use system\core\socials\FB;
+use system\core\socials\fb\FacebookRedirectLoginHelper;
+use system\core\socials\fb\FacebookRequest;
+use system\core\socials\fb\FacebookRequestException;
+use system\core\socials\fb\FacebookSession;
+use system\core\socials\fb\GraphUser;
 use system\core\socials\OK;
 use system\core\socials\VK;
 use webapp\modules\auth\forms\LoginForm;
-use webapp\modules\auth\services\PasswordRetrieveService;
-use webapp\modules\auth\services\TokenCheckService;
+use webapp\modules\auth\forms\RegistrationForm;
+use webapp\modules\auth\models\UserKind;
 use webapp\modules\cabinet\models\UserExtend;
+use webapp\modules\cabinet\services\UpdateUserDataService;
 use webapp\modules\users\models\User;
 use system\core\App;
-use system\core\Tools;
-use system\core\Validation;
 
 class Controller extends \system\core\Controller
 {
 
 	protected $status;
+	private $registerFormName = 'registerForm';
 
 	protected function initOnce()
 	{
-		App::html()->design = '@realty';
-		App::html()
-		   ->setJs("/templates/admin/js/jquery.dialog2.js");
-		App::html()
-		   ->setJs("/templates/admin/js/jquery.form.js");
-		App::html()
-		   ->setJs('/public/components/realty/vendor/datatables/media/js/jquery.dataTables.js');
-		App::html()
-		   ->setJs("/public/components/realty/vendor/bootstrap-fileinput/js/fileinput.min.js");
-		App::html()
-		   ->setCss("/public/components/realty/vendor/bootstrap-fileinput/css/fileinput.css");
-		App::html()
-		   ->setJs("/public/components/object_statuses/js/icheck-init.js");
-		App::html()
-		   ->setJs("/public/components/object_statuses/js/jquery.icheck.min.js");
-		App::html()
-		   ->setCss("/public/components/object_statuses/css/iCheck/skins/minimal/minimal.css");
-		App::html()
-		   ->setCss("/public/components/object_statuses/css/iCheck/skins/minimal/green.css");
-		App::html()
-		   ->setJs("/public/components/realty/vendor/angular/angular.js");
-		App::html()
-		   ->setJs("/public/components/auth/js/controller.js");
-		App::html()->header = 'Изменение пароля';
+		View::setDesign('blank');
+		View::setDesignParams(['title' => 'Регистрация']);
 	}
 
 	public function actionIndex()
@@ -120,6 +104,9 @@ class Controller extends \system\core\Controller
 			if (!$isSaved) {
 				throw new Exception('Не удалось сохранить пользователя.');
 			}
+		} else {
+			$user->token = $userData->access_token;
+			$user->save();
 		}
 		$_SESSION['USER']['id'] = $user->id;
 		$this->redirect('/auth/registration');
@@ -144,7 +131,7 @@ class Controller extends \system\core\Controller
 		}
 		OK::setConfig($config);
 		$currentUser = OK::getCurrentUser($userData->access_token);
-		if(!isset($currentUser->uid)){
+		if (!isset($currentUser->uid)) {
 			$this->redirect('/auth');
 		}
 		$user = User::factory()
@@ -165,6 +152,62 @@ class Controller extends \system\core\Controller
 			if (!$isSaved) {
 				throw new Exception('Не удалось сохранить пользователя.');
 			}
+		} else {
+			$user->token = $userData->refresh_token;
+			$user->save();
+		}
+		$_SESSION['USER']['id'] = $user->id;
+		$this->redirect('/auth/registration');
+	}
+
+	public function actionFb()
+	{
+		$fbAPI = App::getConfig()['fbAPI'];
+		FacebookSession::setDefaultApplication($fbAPI['APPID'], $fbAPI['SECURITY_KEY']);
+		$helper = new FacebookRedirectLoginHelper($fbAPI['redirectURL']);
+		try {
+			$session = $helper->getSessionFromRedirect();
+		} catch(FacebookRequestException $ex) {
+			$this->redirect(App::getConfig()['loginURL']);
+		} catch(\Exception $ex) {
+			$this->redirect(App::getConfig()['loginURL']);
+		}
+		if (!isset($session)) {
+			$this->redirect(App::getConfig()['loginURL']);
+		}
+		/**
+		 * @var GraphUser $currentUser
+		 */
+		$currentUser = (
+		new FacebookRequest(
+			$session, 'GET', '/me'
+		)
+		)->execute()
+		 ->getGraphObject(GraphUser::className());
+		if (is_null($currentUser->getId())) {
+			$this->redirect('/auth');
+		}
+		$user = User::factory()
+					->where('site', User::SITE_FB)
+					->where('socialid', $currentUser->getId())
+					->findOne();
+		if (!$user) {
+			$user    = User::create(
+				[
+					'site'     => User::SITE_FB,
+					'status'   => User::STATUS_SOCIAL_APPROVE,
+					'rights'   => User::USER_RIGHTS,
+					'socialid' => $currentUser->getId(),
+					'token'    => $session->getAccessToken(),
+				]
+			);
+			$isSaved = $user->save();
+			if (!$isSaved) {
+				throw new Exception('Не удалось сохранить пользователя.');
+			}
+		} else {
+			$user->token = $session->getAccessToken();
+			$user->save();
 		}
 		$_SESSION['USER']['id'] = $user->id;
 		$this->redirect('/auth/registration');
@@ -176,30 +219,50 @@ class Controller extends \system\core\Controller
 		if (!$userSocialID) {
 			$this->redirect('/auth');
 		}
-		$site         = $this->getSocialNetwork();
-		if(!$site){
+		$userExtend = UserExtend::factory()->where('user_id', App::get('user')->id)->findOne();
+		if($userExtend){
+			App::response()->redirect('/cabinet');
+		}
+
+		$site = $this->getSocialNetwork();
+		if (!$site) {
 			$this->redirect('/auth');
 		}
 		$userData = $site->getUser($userSocialID);
-		$userExt    = UserExtend::factory()
-								->where('user_id', App::get('user')->id)
-								->findOne();
-		if (!$userExt) {
-			$userExt = UserExtend::create(
-				[
-					'user_id'    => App::get('user')->id,
-					'first_name' => $userData->first_name,
-					'last_name'  => $userData->last_name,
-				]
-			);
+		$form     = new RegistrationForm($this->registerFormName);
+		$form->load(
+			[
+				'first_name' => $userData->first_name,
+				'last_name'  => $userData->last_name,
+			]
+		);
+		if (App::request()
+			   ->post($this->registerFormName)
+		) {
+			$serviceDataArray = [
+				'userData'  => App::request()
+								  ->post($this->registerFormName),
+				'userFiles' => null,
+				'isModerate' => false,
+			];
+			(new UpdateUserDataService())->load($serviceDataArray)->run();
+			User::findOne(App::get('user')->id)
+				->set('status', User::STATUS_REGISTERED)
+				->save();
+			App::response()
+			   ->redirect('/cabinet');
 		}
-		$userExt->save();
+		return View::withDesign(
+			'register', [
+						  'form' => $form,
+					  ]
+		);
 	}
 
 	private function getSocialNetwork()
 	{
 		$site = false;
-		switch(App::get('user')->site){
+		switch (App::get('user')->site) {
 			case User::SITE_VK:
 				$site = new VK();
 				VK::setConfig(App::getConfig()['vkAPI']);
@@ -207,6 +270,10 @@ class Controller extends \system\core\Controller
 			case User::SITE_OK:
 				$site = new OK();
 				OK::setConfig(App::getConfig()['okAPI']);
+				break;
+			case User::SITE_FB:
+				$site = new FB();
+				FB::setConfig(App::getConfig()['fbAPI']);
 				break;
 		}
 		return $site;

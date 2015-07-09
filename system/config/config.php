@@ -6,7 +6,7 @@ use system\core\App;
 
 \system\core\App::setAlias('webroot', _ROOT_PATH_);
 \system\core\App::setAlias('webapp', _WEBAPP_);
-\system\core\App::setAlias('system', __DIR__);
+\system\core\App::setAlias('system', dirname(dirname(__FILE__)));
 $config     = [
 	'webappFolder' => \system\core\App::getPathOfAlias('webapp'),
 	'systemFolder' => \system\core\App::getPathOfAlias('system'),

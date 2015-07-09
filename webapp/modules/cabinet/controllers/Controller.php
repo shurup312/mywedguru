@@ -4,10 +4,14 @@ namespace webapp\modules\cabinet\controllers;
 use system\core\App;
 use system\core\base\View;
 use system\core\behaviors\AccessBehavior;
-use system\core\helpers\ArrayHelper;
-use system\core\helpers\ImageHelper;
+use webapp\assets\BootstrapAsset;
 use webapp\modules\cabinet\forms\UserForm;
 use webapp\modules\cabinet\models\UserExtend;
+use webapp\modules\cabinet\models\UserExtendHistory;
+use webapp\modules\cabinet\services\ApproveUserChangeService;
+use webapp\modules\cabinet\services\RejectUserChangeService;
+use webapp\modules\cabinet\services\SendInviteService;
+use webapp\modules\cabinet\services\UpdateUserDataService;
 use webapp\modules\users\models\User;
 
 /**
@@ -18,6 +22,8 @@ use webapp\modules\users\models\User;
  */
 class Controller extends \system\core\Controller
 {
+
+	public $formName = 'userCabinet';
 
 	public function behaviors()
 	{
@@ -33,17 +39,52 @@ class Controller extends \system\core\Controller
 		];
 	}
 
+	protected function init()
+	{
+		BootstrapAsset::init();
+		View::setDesign('blank');
+		View::setDesignParams(
+			[
+				'header' => '',
+				'title'  => '',
+			]
+		);
+	}
+
 	public function actionIndex()
 	{
 		$text = 'Данные пользователя';
-		View::setDesign('admin');
 		View::setDesignParams(
 			[
 				'header' => $text,
 				'title'  => $text,
 			]
 		);
-		$formName = 'userCabinet';
+		$existModerate = UserExtendHistory::factory()
+										  ->where('status', UserExtendHistory::NOT_APPROVED_STATUS)
+										  ->where('user_id', App::get('user')->id)
+										  ->findOne();
+		$userExtend    = UserExtend::factory()
+								   ->where('user_id', App::get('user')->id)
+								   ->findOne();
+		return View::withDesign(
+			'index', [
+					   'user'          => $userExtend,
+					   'existModerate' => $existModerate,
+				   ]
+		);
+	}
+
+	public function actionEdit()
+	{
+		$text = 'Редактирование данных пользователя';
+		View::setDesignParams(
+			[
+				'header' => $text,
+				'title'  => $text,
+			]
+		);
+		$formName = $this->formName;
 		$form     = new UserForm($formName);
 		$userData = UserExtend::factory()
 							  ->where('user_id', App::get('user')->id)
@@ -53,45 +94,81 @@ class Controller extends \system\core\Controller
 			$form->load($userData);
 		}
 		return View::withDesign(
-			'index', [
-					   'user' => $userData,
-					   'form' => $form,
-				   ]
+			'edit', [
+					  'user' => $userData,
+					  'form' => $form,
+				  ]
 		);
 	}
 
 	public function actionSave()
 	{
-		$formName = 'userCabinet';
-		if (!App::request()
-				->post($formName)
-		) {
-			$this->redirect('/cabinet');
+		if (App::request()->post($this->formName))
+		{
+			$serviceDataArray = [
+				'userData' => App::request()
+								 ->post($this->formName),
+				'userFiles'=>App::request()->files($this->formName),
+			];
+			(new UpdateUserDataService())->load($serviceDataArray)->run();
 		}
-		$userData = UserExtend::factory()
-							  ->where('user_id', App::get('user')->id)
-							  ->findOne();
-		if (!$userData) {
-			$userData = UserExtend::create(['user_id' => App::get('user')->id]);
-		}
-		$userData->set(
-			App::request()
-			   ->post($formName)
+		App::response()
+		   ->redirect('/cabinet');
+	}
+
+	public function actionListChanges()
+	{
+		$text = 'Список новых заяков на изменение личных данных';
+		View::setDesignParams(
+			[
+				'header' => $text,
+				'title'  => $text,
+			]
 		);
-		if (isset($_FILES[$formName]['tmp_name']['avatar'])) {
-			$imagePath     = $_FILES[$formName]['tmp_name']['avatar'];
-			$image         = new ImageHelper($imagePath);
-			$imageName     = microtime(true);
-			$directoryName = App::module()->config['imageFolder'];
-			$filename      = $imageName.'.'.$image->get_original_info()['format'];
-			if (!file_exists($directoryName)) {
-				mkdir($directoryName, 0777);
-			}
-			$image->thumbnail(App::module()->config['thmbWidth'], App::module()->config['thmbHeight'])
-				  ->save($directoryName.$filename);
-			$userData->set(['avatar' => $filename]);
-		}
-		$userData->save();
-		$this->redirect('/cabinet');
+		$userHistoryTable       = UserExtendHistory::$table;
+		$userTable              = UserExtend::$table;
+		$listNotApprovedChanges = UserExtendHistory::factory()
+												   ->rawSelect($userHistoryTable.'.id')
+												   ->rawSelect($userHistoryTable.'.first_name new_first_name ,'.$userTable.'.first_name old_first_name')
+												   ->rawSelect($userHistoryTable.'.last_name new_last_name ,'.$userTable.'.last_name old_last_name')
+												   ->rawSelect($userHistoryTable.'.phone new_phone ,'.$userTable.'.phone old_phone')
+												   ->rawSelect($userHistoryTable.'.work_phone new_work_phone ,'.$userTable.'.work_phone old_work_phone')
+												   ->rawSelect($userHistoryTable.'.passport new_passport ,'.$userTable.'.passport old_passport')
+												   ->rawSelect($userHistoryTable.'.passport_ext new_passport_ext ,'.$userTable.'.passport_ext old_passport_ext')
+												   ->rawSelect($userHistoryTable.'.avatar new_avatar ,'.$userTable.'.avatar old_avatar')
+												   ->where($userHistoryTable.'.status', UserExtendHistory::NOT_APPROVED_STATUS)
+												   ->leftOuterJoin($userTable, $userTable.'.user_id = '.$userHistoryTable.'.user_id')
+												   ->findMany();
+		return View::withDesign(
+			'listChanges', [
+							 'list' => $listNotApprovedChanges,
+						 ]
+		);
+	}
+
+	public function actionApprove($id)
+	{
+		(new ApproveUserChangeService())->load(
+			[
+				'id'            => $id,
+				'approveUserID' => App::get('user')->id,
+			]
+		)
+										->run();
+		App::response()
+		   ->redirect('/cabinet/listchanges');
+	}
+
+	public function actionReject($id)
+	{
+		(new RejectUserChangeService())->load(
+			[
+				'id'           => $id,
+				'rejectUserID' => App::get('user')->id,
+			]
+		)
+									   ->run();
+		App::response()
+		   ->redirect('/cabinet/listchanges');
 	}
 }

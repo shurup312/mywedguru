@@ -16,6 +16,8 @@ class User extends Model
 	const SITE_VK = 1;
 
 	const STATUS_SOCIAL_APPROVE = 1;
+	const STATUS_REGISTERED = 2;
 	const SITE_OK = 2;
+	const SITE_FB = 3;
 	public static $table = 'users';
 }
