@@ -5,10 +5,10 @@
  * Date: 24.06.2015
  * Time: 19:55
  */
+define("_ROOT_PATH_", __DIR__.DIRECTORY_SEPARATOR.'www'.DIRECTORY_SEPARATOR);
+require __DIR__.DIRECTORY_SEPARATOR."system".DIRECTORY_SEPARATOR."boot.php";
 use system\core\App;
 use system\core\ORM;
-define("_ROOT_PATH_", dirname(__FILE__));
-require (dirname(__FILE__).DIRECTORY_SEPARATOR."system".DIRECTORY_SEPARATOR."boot.php");
 
 App::go();
 ORM::rawExecute("CREATE TABLE IF NOT EXISTS `migrate` (
