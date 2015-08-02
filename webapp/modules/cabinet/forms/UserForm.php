@@ -37,46 +37,6 @@ class UserForm extends Form
 					'class'     => 'form-control',
 				],
 			],
-			'phone'        => [
-				'type'       => InputTag::className(),
-				'label'      => 'Телефон',
-				'attributes' => [
-					'type'      => 'text',
-					'name'      => 'phone',
-					'maxlength' => '64',
-					'class'     => 'form-control',
-				],
-			],
-			'work_phone'   => [
-				'type'       => InputTag::className(),
-				'label'      => 'Рабочий телефон',
-				'attributes' => [
-					'type'      => 'text',
-					'name'      => 'work_phone',
-					'maxlength' => '64',
-					'class'     => 'form-control',
-				],
-			],
-			'passport'     => [
-				'type'       => InputTag::className(),
-				'label'      => 'Серия и номер паспорта',
-				'attributes' => [
-					'type'      => 'text',
-					'name'      => 'passport',
-					'maxlength' => '64',
-					'class'     => 'form-control',
-				],
-			],
-			'passport_ext' => [
-				'type'       => InputTag::className(),
-				'label'      => 'Кем и когда выдан',
-				'attributes' => [
-					'type'      => 'text',
-					'name'      => 'passport_ext',
-					'maxlength' => '64',
-					'class'     => 'form-control',
-				],
-			],
 			'avatar'       => [
 				'type'       => InputTag::className(),
 				'label'      => 'Аватарка',

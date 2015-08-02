@@ -16,7 +16,5 @@ namespace webapp\modules\cabinet\models;
  */
 class UserExtendPhotographerHistory extends UserExtendHistory
 {
-
 	public static $table = 'user_extends_photographers_history';
-
 }

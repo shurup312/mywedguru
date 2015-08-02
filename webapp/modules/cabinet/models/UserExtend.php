@@ -20,7 +20,7 @@ use Exception;
  * @property string  passport
  * @property string  passport_ext
  */
-class UserExtend extends UserExtendsAbstract
+class UserExtend extends UserExtendsBase
 {
 	public static function getModelNameByType($typeID)
 	{

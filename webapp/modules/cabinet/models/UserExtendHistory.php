@@ -21,7 +21,7 @@ use system\core\App;
  * @property string passport
  * @property string passport_ext
  */
-class UserExtendHistory extends UserExtendsAbstract
+class UserExtendHistory extends UserExtendsBase
 {
 	const NOT_APPROVED_STATUS = 1;
 	const REWRITED_STATUS = 2;

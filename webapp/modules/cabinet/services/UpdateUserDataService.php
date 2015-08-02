@@ -79,7 +79,7 @@ class UpdateUserDataService extends Service
 									->findOne();
 		} else {
 			UserExtendHistory::getModelNameByType($this->userType)
-							 ->rawExecute('UPDATE '.UserExtendHistory::$table.' SET status='.UserExtendHistory::REWRITED_STATUS.' WHERE user_id='.$this->baseUser->id.' AND status='.UserExtendHistory::NOT_APPROVED_STATUS);
+							 ->rawExecute('UPDATE user_extends_'.UserExtendHistory::getPrefixByType($this->userType).'_history SET status='.UserExtendHistory::REWRITED_STATUS.' WHERE user_id='.$this->baseUser->id.' AND status='.UserExtendHistory::NOT_APPROVED_STATUS);
 			$this->user = UserExtendHistory::getModelNameByType($this->userType)->create(
 				[
 					'user_id' => $this->baseUser->id,

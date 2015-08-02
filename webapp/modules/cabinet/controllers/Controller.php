@@ -8,6 +8,7 @@ use webapp\assets\BootstrapAsset;
 use webapp\modules\cabinet\forms\UserForm;
 use webapp\modules\cabinet\models\UserExtend;
 use webapp\modules\cabinet\models\UserExtendHistory;
+use webapp\modules\cabinet\models\UserExtendsBase;
 use webapp\modules\cabinet\services\ApproveUserChangeService;
 use webapp\modules\cabinet\services\RejectUserChangeService;
 use webapp\modules\cabinet\services\SendInviteService;
@@ -68,10 +69,10 @@ class Controller extends \system\core\Controller
 								   ->where('user_id', App::get('user')->id)
 								   ->findOne();
 		return View::withDesign(
-			'index', [
-					   'user'          => $userExtend,
-					   'existModerate' => $existModerate,
-				   ]
+			$this->getViewPath('index'), [
+										   'user'          => $userExtend,
+										   'existModerate' => $existModerate,
+									   ]
 		);
 	}
 
@@ -86,7 +87,7 @@ class Controller extends \system\core\Controller
 		);
 		$formName = $this->formName;
 		$form     = new UserForm($formName);
-		$userData = UserExtend::factory()
+		$userData = UserExtend::getCurrentModel()
 							  ->where('user_id', App::get('user')->id)
 							  ->findArray();
 		if ($userData) {
@@ -103,14 +104,18 @@ class Controller extends \system\core\Controller
 
 	public function actionSave()
 	{
-		if (App::request()->post($this->formName))
-		{
+		if (App::request()
+			   ->post($this->formName)
+		) {
 			$serviceDataArray = [
-				'userData' => App::request()
-								 ->post($this->formName),
-				'userFiles'=>App::request()->files($this->formName),
+				'userData'  => App::request()
+								  ->post($this->formName),
+				'userType'  => App::get('user')->user_type,
+				'userFiles' => App::request()
+								  ->files($this->formName),
 			];
-			(new UpdateUserDataService())->load($serviceDataArray)->run();
+			(new UpdateUserDataService())->load($serviceDataArray)
+										 ->run();
 		}
 		App::response()
 		   ->redirect('/cabinet');
@@ -170,5 +175,11 @@ class Controller extends \system\core\Controller
 									   ->run();
 		App::response()
 		   ->redirect('/cabinet/listchanges');
+	}
+
+	private function getViewPath($viewName)
+	{
+		$prefix = UserExtendsBase::getPrefixByType(App::get('user')->user_type);
+		return $prefix.'.'.$viewName;
 	}
 }
