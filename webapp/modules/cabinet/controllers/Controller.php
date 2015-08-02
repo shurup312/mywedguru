@@ -60,11 +60,11 @@ class Controller extends \system\core\Controller
 				'title'  => $text,
 			]
 		);
-		$existModerate = UserExtendHistory::factory()
+		$existModerate = UserExtendHistory::getCurrentModel()
 										  ->where('status', UserExtendHistory::NOT_APPROVED_STATUS)
 										  ->where('user_id', App::get('user')->id)
 										  ->findOne();
-		$userExtend    = UserExtend::factory()
+		$userExtend    = UserExtend::getCurrentModel()
 								   ->where('user_id', App::get('user')->id)
 								   ->findOne();
 		return View::withDesign(

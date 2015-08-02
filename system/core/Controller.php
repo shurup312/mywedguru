@@ -71,6 +71,7 @@ class Controller extends Object
 		$this->setMethodForRun();
 		$this->checkMethod();
 		$this->checkActionClass();
+		$this->prepareParams();
 		if(!$this->action && !$this->actionClass){
 			throw new Exception('Страница не найдена.');
 		}
@@ -153,8 +154,7 @@ class Controller extends Object
 
 	public function redirect($url)
 	{
-		header('Location: '.$url);
-		die();
+		App::response()->redirect($url);
 	}
 
 	public function behaviors()
@@ -274,7 +274,7 @@ class Controller extends Object
 													->getNumberOfRequiredParameters();
 			$methodParams         = $reflectionClass->getMethod($this->action)
 													->getParameters();
-			if (sizeof($this->parameters)!==$numberRequiredParams && sizeof($this->parameters)!==sizeof($methodParams)) {
+			if ($numberRequiredParams>0 && sizeof($this->parameters)<$numberRequiredParams || sizeof($methodParams)>0 && sizeof($this->parameters)>sizeof($methodParams)) {
 				throw new NotFoundException();
 			}
 		}
@@ -404,5 +404,12 @@ class Controller extends Object
 			$result = $this->actionClass['action'];
 		}
 		return $result;
+	}
+
+	private function prepareParams()
+	{
+		foreach ($this->parameters as $key => $item) {
+			$this->parameters[$key] = urldecode($item);
+		}
 	}
 }

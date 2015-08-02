@@ -16,6 +16,11 @@ class Response extends Object
 {
 	const STRING_FORMAT = 1;
 	const JSON_FORMAT = 2;
+	const STATUS_403 = 403;
+	const STATUS_404 = 404;
+	const STATUS_301 = 301;
+	const STATUS_500 = 500;
+	const STATUS_200 = 200;
 	public static $format = self::STRING_FORMAT;
 
 	public static function run($content)
@@ -36,5 +41,26 @@ class Response extends Object
 	public function redirect($url){
 		header('Location: '.$url);
 		die();
+	}
+
+	public function setStatus($status)
+	{
+		switch($status){
+			case self::STATUS_301:
+				header('HTTP/1.1 301 Moved Permanently');
+				break;
+			case self::STATUS_500:
+				header('HTTP/1.1 500 Internal Server Error');
+				break;
+			case self::STATUS_200:
+				header('HTTP/1.1 200 OK');
+				break;
+			case self::STATUS_403:
+				header('HTTP/1.1 403 Forbidden');
+				break;
+			case self::STATUS_404:
+				header('HTTP/1.0 404 Not Found');
+				break;
+		}
 	}
 }

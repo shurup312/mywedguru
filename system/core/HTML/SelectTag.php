@@ -33,12 +33,17 @@ class SelectTag extends Tag
 	private function getOptions($options, $selectedValue)
 	{
 		$result = '';
-		foreach ($options as $value=>$text) {
-			$attributes = ['value' => $value];
-			if($selectedValue == $value){
-				$attributes['selected'] = 'selected';
+		foreach ($options as $key=>$include) {
+			if(is_array($include)){
+				$optionsInGroup = $this->getOptions($include, $selectedValue);
+				$result.= (new OptgroupTag())->run(['label'=>$key], $optionsInGroup);
+			} else {
+				$attributes = ['value' => $key];
+				if($selectedValue == $key){
+					$attributes['selected'] = 'selected';
+				}
+				$result.= (new OptionTag())->run($attributes, $include);
 			}
-			$result.= (new OptionTag())->run($attributes, $text);
 		}
 		return $result;
 	}

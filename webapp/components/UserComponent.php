@@ -9,6 +9,7 @@
 
 namespace webapp\components;
 
+use system\core\App;
 use system\core\base\Component;
 use webapp\modules\users\models\User;
 
@@ -26,10 +27,27 @@ class UserComponent extends Component{
 		if(!$this->id){
 			return false;
 		}
-		if(!$this->user){
-			$this->user = User::findOne($this->id);
-		}
-		return isset($this->user->$name)?$this->user->$name:null;
+		$this->getUserFromTable();
+		return $this->user->$name;
 	}
 
-} 
+	public function is($rights){
+		return App::get('user')->rights&$rights;
+	}
+
+	public function getUser()
+	{
+		if(!$this->id){
+			return false;
+		}
+		$this->getUserFromTable();
+		return $this->user;
+	}
+
+	private function getUserFromTable()
+	{
+		if (!$this->user) {
+			$this->user = User::findOne($this->id);
+		}
+	}
+}

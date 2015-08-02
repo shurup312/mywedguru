@@ -276,7 +276,6 @@ class ORM implements ArrayAccess, Iterator
             );
             $connection->setAttribute(PDO::ATTR_ERRMODE, self::$config[$connection_name]['error_mode']);
             self::setConnection($connection, $connection_name);
-            self::rawExecute('SET names "'.App::getConfig()['db']['charset'].'"');
         }
     }
 

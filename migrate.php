@@ -29,6 +29,8 @@ foreach ($migrateFilesList as $file) {
 		continue;
 	}
 	$queryCode = file_get_contents($file);
+	echo "File: ".$file."\r\n";
+	echo "Query: ".$queryCode."\r\n";
 	ORM::rawExecute($queryCode);
 	ORM::rawExecute('INSERT INTO `migrate` (`name`) VALUES ("'.$fileInfo['filename'].'");');
 }

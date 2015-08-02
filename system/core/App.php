@@ -9,6 +9,7 @@ namespace system\core;
 use system\core\base\Component;
 use system\core\base\Request;
 use system\core\base\Route;
+use system\core\base\Session;
 use system\core\response\Response;
 use webapp\modules\realty\models\User;
 use system\core\base\ExceptionHandler;
@@ -30,6 +31,7 @@ class App
 	const BEFORE_CONTROLLER = 'beforeController';
 	private static $html;
 	private static $response;
+	private static $session;
 	// ну и конечно ссылка!
 	public $url;
 	// все ошибки!
@@ -245,6 +247,13 @@ class App
 		}
 		return self::$request;
 	}
+	public static function session()
+	{
+		if (!self::$session) {
+			self::$session = new Session();
+		}
+		return self::$session;
+	}
 
 	public static function response()
 	{
@@ -317,7 +326,7 @@ class App
 			$result = $path.'.php';
 		}
 		if (!$result) {
-			throw new Exception('Не найдено определение для алиаса '.implode('.', $alias));
+			//throw new Exception('Не найдено определение для алиаса '.implode('.', $alias));
 		}
 		$result = str_replace('\\\\', '\\', $result);
 		return $result;

@@ -21,6 +21,7 @@ class UpdateUserDataService extends Service
 
 	public $userFiles = false;
 	public $userData = false;
+	public $userType = false;
 	/**
 	 * @var UserExtend
 	 */
@@ -59,7 +60,7 @@ class UpdateUserDataService extends Service
 			$historyDate = $this->user->asArray();
 			unset($historyDate['id']);
 			$historyDate = ArrayHelper::merge($historyDate, ['status' => UserExtendHistory::NOT_MODERATE_STATUS]);
-			UserExtendHistory::create($historyDate)
+			UserExtendHistory::getModelNameByType($this->userType)->create($historyDate)
 							 ->save();
 		}
 	}
@@ -73,13 +74,13 @@ class UpdateUserDataService extends Service
 			$this->baseUser = App::get('user');
 		}
 		if (!$this->isModerate) {
-			$this->user = UserExtend::factory()
+			$this->user = UserExtend::getModelNameByType($this->userType)
 									->where('user_id', $this->baseUser->id)
 									->findOne();
 		} else {
-			UserExtendHistory::factory()
+			UserExtendHistory::getModelNameByType($this->userType)
 							 ->rawExecute('UPDATE '.UserExtendHistory::$table.' SET status='.UserExtendHistory::REWRITED_STATUS.' WHERE user_id='.$this->baseUser->id.' AND status='.UserExtendHistory::NOT_APPROVED_STATUS);
-			$this->user = UserExtendHistory::create(
+			$this->user = UserExtendHistory::getModelNameByType($this->userType)->create(
 				[
 					'user_id' => $this->baseUser->id,
 					'status'  => UserExtendHistory::NOT_APPROVED_STATUS,
@@ -91,7 +92,7 @@ class UpdateUserDataService extends Service
 	private function createUserIfNotExists()
 	{
 		if (!$this->user) {
-			$this->user = UserExtend::create(['user_id' => $this->baseUser->id]);
+			$this->user = UserExtend::getModelNameByType($this->userType)->create(['user_id' => $this->baseUser->id]);
 		}
 	}
 

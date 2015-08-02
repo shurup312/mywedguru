@@ -4,33 +4,37 @@ namespace system\core\base;
 class Request
 {
 
+	const METHOD_GET = 'GET';
+	const METHOD_POST = 'POST';
+	const METHOD_PUT = 'PUT';
+	const METHOD_DELETE = 'DELETE';
+
 	public function isAjax()
 	{
-		if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
-		{
+		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH'])=='xmlhttprequest') {
 			return true;
-		}else
-		{
+		} else {
 			return false;
 		}
 	}
 
 	public function get($name = false)
 	{
-		if(!$name){
+		if (!$name) {
 			return $_GET;
 		}
-		if(!isset($_GET[$name])){
+		if (!isset($_GET[$name])) {
 			return null;
 		}
 		return $_GET[$name];
 	}
+
 	public function post($name = false)
 	{
-		if(!$name){
+		if (!$name) {
 			return $_POST;
 		}
-		if(!isset($_POST[$name])){
+		if (!isset($_POST[$name])) {
 			return null;
 		}
 		return $_POST[$name];
@@ -38,10 +42,10 @@ class Request
 
 	public function files($name = false)
 	{
-		if(!$name){
+		if (!$name) {
 			return $_FILES;
 		}
-		if(!isset($_FILES[$name])){
+		if (!isset($_FILES[$name])) {
 			return null;
 		}
 		return $_FILES[$name];
@@ -56,6 +60,17 @@ class Request
 	{
 		return $_SERVER['REQUEST_METHOD'];
 	}
+
+	public function getURL()
+	{
+		return $_SERVER['REQUEST_URI'];
+	}
+
+	public function getReferrerURL()
+	{
+		return $_SERVER['HTTP_REFERER'];
+	}
+
 }
- 
+
 ?>

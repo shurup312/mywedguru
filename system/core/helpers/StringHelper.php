@@ -178,9 +178,10 @@ class StringHelper
 		return strtr($string, $charset);
 	}
 
-	public static function formattedDate(DateTime $date)
+	public static function formattedDate(DateTime $date, $format = false)
 	{
-		return $date->format(App::getConfig()['dateFormat']);
+		$resultFormat = !$format?App::getConfig()['dateFormat']:$format;
+		return $date->format($resultFormat);
 	}
 
 	public static function encode($string)

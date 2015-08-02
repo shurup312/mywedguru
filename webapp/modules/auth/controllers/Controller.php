@@ -17,9 +17,8 @@ use system\core\socials\fb\GraphUser;
 use system\core\socials\OK;
 use system\core\socials\VK;
 use webapp\modules\auth\forms\LoginForm;
-use webapp\modules\auth\forms\RegistrationForm;
-use webapp\modules\auth\models\UserKind;
-use webapp\modules\cabinet\models\UserExtend;
+use webapp\modules\auth\forms\RegistrationBrideForm;
+use webapp\modules\auth\forms\RegistrationPhotographerForm;
 use webapp\modules\cabinet\services\UpdateUserDataService;
 use webapp\modules\users\models\User;
 use system\core\App;
@@ -109,7 +108,7 @@ class Controller extends \system\core\Controller
 			$user->save();
 		}
 		$_SESSION['USER']['id'] = $user->id;
-		$this->redirect('/auth/registration');
+		$this->redirect('/auth/checktype');
 	}
 
 	public function actionOk()
@@ -120,7 +119,7 @@ class Controller extends \system\core\Controller
 				   ->get('code')
 			)
 		) {
-			$this->redirect(App::getConfig()['loginURL']);
+			App::response()->redirect(App::getConfig()['loginURL']);
 		}
 		$code     = App::request()
 					   ->get('code');
@@ -157,7 +156,7 @@ class Controller extends \system\core\Controller
 			$user->save();
 		}
 		$_SESSION['USER']['id'] = $user->id;
-		$this->redirect('/auth/registration');
+		$this->redirect('/auth/checktype');
 	}
 
 	public function actionFb()
@@ -210,26 +209,44 @@ class Controller extends \system\core\Controller
 			$user->save();
 		}
 		$_SESSION['USER']['id'] = $user->id;
-		$this->redirect('/auth/registration');
+		App::response()->redirect('/auth/checktype');
 	}
 
-	public function actionRegistration()
+	public function actionChecktype()
 	{
-		$userSocialID = App::get('user')->socialid;
-		if (!$userSocialID) {
-			$this->redirect('/auth');
+		$this->validateSocialNetwork();
+
+		$userType = App::get('user')->user_type;
+		if($userType && App::get('user')->status == USER::STATUS_REGISTERED){
+			App::response()->redirect('/auth/step1/'.$userType);
 		}
-		$userExtend = UserExtend::factory()->where('user_id', App::get('user')->id)->findOne();
-		if($userExtend){
-			App::response()->redirect('/cabinet');
+		return View::withDesign('checktype');
+	}
+
+	public function actionStep1($userType=false)
+	{
+		$this->validateSocialNetwork();
+
+		if(!$userType){
+			App::response()->redirect('/auth');
 		}
+		if(App::get('user')->user_type && App::get('user')->status == User::STATUS_REGISTERED){
+			App::response()->redirect('/auth/step2');
+		}
+		App::get('user')->getUser()->set('user_type',$userType)->save();
+		App::response()->redirect('/auth/step2');
+
+	}
+
+	public function actionStep2()
+	{
+		$this->validateSocialNetwork();
+		$this->validateRegistrationStep();
 
 		$site = $this->getSocialNetwork();
-		if (!$site) {
-			$this->redirect('/auth');
-		}
+		$userSocialID = App::get('user')->socialid;
 		$userData = $site->getUser($userSocialID);
-		$form     = new RegistrationForm($this->registerFormName);
+		$form = $this->getRegistrationForm();
 		$form->load(
 			[
 				'first_name' => $userData->first_name,
@@ -239,13 +256,7 @@ class Controller extends \system\core\Controller
 		if (App::request()
 			   ->post($this->registerFormName)
 		) {
-			$serviceDataArray = [
-				'userData'  => App::request()
-								  ->post($this->registerFormName),
-				'userFiles' => null,
-				'isModerate' => false,
-			];
-			(new UpdateUserDataService())->load($serviceDataArray)->run();
+			$this->saveUserData();
 			User::findOne(App::get('user')->id)
 				->set('status', User::STATUS_REGISTERED)
 				->save();
@@ -276,7 +287,59 @@ class Controller extends \system\core\Controller
 				FB::setConfig(App::getConfig()['fbAPI']);
 				break;
 		}
+		if (!$site) {
+			App::response()->redirect('/auth');
+		}
 		return $site;
+	}
+
+	/**
+	 * @return mixed
+	 * @throws Exception
+	 */
+	protected function validateSocialNetwork()
+	{
+		if (!App::get('user')->socialid) {
+			App::response()->redirect('/auth');
+		}
+	}
+
+	protected function validateRegistrationStep()
+	{
+		if (App::get('user')->type_user) {
+			App::response()
+			   ->redirect('/auth/step1/');
+		}
+		if(App::get('user')->status == User::STATUS_REGISTERED){
+			App::response()->redirect('/cabinet');
+		}
+	}
+
+	protected function getRegistrationForm()
+	{
+		$form = false;
+		switch(App::get('user')->user_type){
+			case 1:
+				$form = new RegistrationBrideForm($this->registerFormName);
+				break;
+			case 2:
+				$form = new RegistrationPhotographerForm($this->registerFormName);
+		}
+
+		return $form;
+	}
+
+	protected function saveUserData()
+	{
+		$serviceDataArray = [
+			'userData'   => App::request()
+							   ->post($this->registerFormName),
+			'userType'  => App::get('user')->user_type,
+			'userFiles'  => null,
+			'isModerate' => false,
+		];
+		(new UpdateUserDataService())->load($serviceDataArray)
+									 ->run();
 	}
 }
 

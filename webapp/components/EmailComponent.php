@@ -29,6 +29,7 @@ class EmailComponent extends Component
 		$mailConfig   = App::getConfig()['components']['mail'];
 		$this->mailer = new PHPMailer();
 		$this->mailer->isSMTP();
+		$this->mailer->isHTML();
 		$this->mailer->SMTPDebug = 0;
 		$this->mailer->SMTPAuth  = true;
 		$this->mailer->setFrom($mailConfig['login'], $mailConfig['login']);

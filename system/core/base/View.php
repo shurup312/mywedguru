@@ -11,6 +11,7 @@ namespace system\core\base;
 use \system\core\App;
 use system\core\helpers\ArrayHelper;
 use Exception;
+use system\core\response\Response;
 
 class View
 {
@@ -76,6 +77,7 @@ class View
 
 	public static function withoutDesign($alias, $data = [])
 	{
+		App::response()->setStatus(Response::STATUS_200);
 		$moduleAliasPath = App::module()->path;
 		$moduleAlias = 'moduleAlias';
 		App::setAlias($moduleAlias, $moduleAliasPath);

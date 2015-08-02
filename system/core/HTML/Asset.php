@@ -30,6 +30,7 @@ abstract class Asset extends Object
 		$self->getFiles();
 		$self->sortByPriority();
 		$self->insertFilesInHTML();
+
 	}
 
 	/**

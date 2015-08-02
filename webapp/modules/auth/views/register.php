@@ -16,9 +16,9 @@ $form->setTemplate('<div class="form-group"><label for="name">{label}</label>{el
 	$form->getForm(
 		 [
 			 'method'  => 'post',
-			 'action'  => '/auth/registration',
 			 'role'  => 'form',
 			 'enctype' => 'multipart/form-data',
 		 ]
 	); ?>
 </div>
+<a href="/auth/checktype">назад на выбор типа пользователя</a>
