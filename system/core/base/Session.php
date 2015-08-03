@@ -7,14 +7,16 @@
  */
 namespace system\core\base;
 
+use system\core\App;
+
 class Session extends Object
 {
     const FLASH_BASE_NAME = 'flash';
 
     public function __construct()
     {
+        $this->setPathOfSessions();
         $this->start();
-        $this->init();
     }
 
     /**
@@ -24,6 +26,7 @@ class Session extends Object
      */
     public function start()
     {
+
         if ($this->isActive()) {
             return ;
         }
@@ -35,12 +38,6 @@ class Session extends Object
     public function isActive()
     {
         return session_status() == PHP_SESSION_ACTIVE;
-    }
-
-    public function destroy()
-    {
-//        session_destroy();
-        //session_unset();
     }
 
     /**
@@ -157,10 +154,13 @@ class Session extends Object
         $this->set(self::FLASH_BASE_NAME . '.' . $name, $content);
     }
 
-    private function init()
+    private function setPathOfSessions()
     {
-//        $this->delete(self::FLASH_BASE_NAME);
+        $sessionPath = App::getPathOfAlias('runtime').DIRECTORY_SEPARATOR.'sessions';
+        if(!file_exists($sessionPath)){
+            mkdir($sessionPath, 0777, true);
+        }
+        session_save_path($sessionPath);
+
     }
-
-
 }

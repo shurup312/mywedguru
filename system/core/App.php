@@ -20,8 +20,8 @@ use stdClass;
 /**
  * Class App
  * @package Core
- * @property Html   $html   instance of system\core\Html class
- * @property User   $user   instance of system\core\fs class
+ * @property Html $html   instance of system\core\Html class
+ * @property User $user   instance of system\core\fs class
  * @static  Request   $request   instance of system\core\Request class
  */
 class App
@@ -98,12 +98,13 @@ class App
 			throw new Exception('Не найден контроллер для страницы.');
 		}
 		$controllerParams->controller = App::createObject($controllerParams->namespace);
+
 		return $controllerParams;
 	}
 
 	public function run()
 	{
-		session_start();
+		App::session();
 		$this->registerHandlers();
 		$this->url = (new Route())->setUrl($_SERVER['REQUEST_URI'])
 								  ->getURLFromRoutes();
@@ -138,6 +139,12 @@ class App
 			[
 				$exceptionHandler,
 				'handler'
+			]
+		);
+		set_error_handler(
+			[
+				$exceptionHandler,
+				'error'
 			]
 		);
 	}
@@ -247,6 +254,7 @@ class App
 		}
 		return self::$request;
 	}
+
 	public static function session()
 	{
 		if (!self::$session) {
@@ -334,23 +342,22 @@ class App
 
 	private function setModuleConfig(Controller $controller)
 	{
-		$reflector = new ReflectionClass($controller);
+		$reflector   = new ReflectionClass($controller);
 		$modulesList = explode('\\modules\\', $reflector->name);
 		array_shift($modulesList);
-		$modulesList[sizeof($modulesList)-1] = str_replace('\controllers\Controller', '', $modulesList[sizeof($modulesList)-1]);
-		$config = App::getConfig();
-		$module = null;
+		$modulesList[sizeof($modulesList) - 1] = str_replace('\controllers\Controller', '', $modulesList[sizeof($modulesList) - 1]);
+		$config                                = App::getConfig();
+		$module                                = null;
 		foreach ($modulesList as $module) {
-			if(!isset($config['modules'][$module])){
-				return ;
+			if (!isset($config['modules'][$module])) {
+				return;
 			}
 			$config = $config['modules'][$module];
 		}
-
 		unset($config['modules']);
-		self::$module = new StdClass();
-		self::$module->path = dirname(dirname($reflector->getFileName())).DIRECTORY_SEPARATOR;
-		self::$module->name = $module;
+		self::$module         = new StdClass();
+		self::$module->path   = dirname(dirname($reflector->getFileName())).DIRECTORY_SEPARATOR;
+		self::$module->name   = $module;
 		self::$module->config = $config;
 	}
 }
