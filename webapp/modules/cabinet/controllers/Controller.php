@@ -5,14 +5,15 @@ use system\core\App;
 use system\core\base\View;
 use system\core\behaviors\AccessBehavior;
 use webapp\assets\BootstrapAsset;
+use webapp\modules\cabinet\forms\AddForm;
 use webapp\modules\cabinet\forms\UserForm;
 use webapp\modules\cabinet\models\UserExtend;
 use webapp\modules\cabinet\models\UserExtendHistory;
 use webapp\modules\cabinet\models\UserExtendsBase;
 use webapp\modules\cabinet\services\ApproveUserChangeService;
 use webapp\modules\cabinet\services\RejectUserChangeService;
-use webapp\modules\cabinet\services\SendInviteService;
 use webapp\modules\cabinet\services\UpdateUserDataService;
+use webapp\modules\cabinet\validators\AddValidator;
 use webapp\modules\users\models\User;
 
 /**
@@ -44,23 +45,10 @@ class Controller extends \system\core\Controller
 	{
 		BootstrapAsset::init();
 		View::setDesign('blank');
-		View::setDesignParams(
-			[
-				'header' => '',
-				'title'  => '',
-			]
-		);
 	}
 
 	public function actionIndex()
 	{
-		$text = 'Данные пользователя';
-		View::setDesignParams(
-			[
-				'header' => $text,
-				'title'  => $text,
-			]
-		);
 		$existModerate = UserExtendHistory::getCurrentModel()
 										  ->where('status', UserExtendHistory::NOT_APPROVED_STATUS)
 										  ->where('user_id', App::get('user')->id)
@@ -78,21 +66,19 @@ class Controller extends \system\core\Controller
 
 	public function actionEdit()
 	{
-		$text = 'Редактирование данных пользователя';
-		View::setDesignParams(
-			[
-				'header' => $text,
-				'title'  => $text,
-			]
-		);
 		$formName = $this->formName;
-		$form     = new UserForm($formName);
+		$form     = new AddForm($formName);
 		$userData = UserExtend::getCurrentModel()
 							  ->where('user_id', App::get('user')->id)
-							  ->findArray();
+							  ->findOne()->asArray();
 		if ($userData) {
-			$userData = $userData[0];
 			$form->load($userData);
+		}
+		if(App::session()->hasFlash('formErrors')){
+			$form->setErrors(App::session()->getFlash('formErrors'));
+		}
+		if(App::session()->hasFlash('post')){
+			$form->load(App::session()->getFlash('post'));
 		}
 		return View::withDesign(
 			'edit', [
@@ -104,18 +90,26 @@ class Controller extends \system\core\Controller
 
 	public function actionSave()
 	{
-		if (App::request()
+		if ($post = App::request()
 			   ->post($this->formName)
 		) {
-			$serviceDataArray = [
-				'userData'  => App::request()
-								  ->post($this->formName),
-				'userType'  => App::get('user')->user_type,
-				'userFiles' => App::request()
-								  ->files($this->formName),
-			];
-			(new UpdateUserDataService())->load($serviceDataArray)
-										 ->run();
+			$form      = new AddForm($this->formName);
+			$form->load($post);
+			$validator = new AddValidator($form);
+			if (!$validator->isValid()) {
+				App::session()->setFlash('formErrors',$validator->getErrors());
+				App::session()->setFlash('post',$post);
+				App::response()->redirect(App::request()->getReferrerURL());
+			} else {
+				$serviceDataArray = [
+					'userData'  => $post,
+					'userType'  => App::get('user')->user_type,
+					'userFiles' => App::request()
+									  ->files($this->formName),
+				];
+				(new UpdateUserDataService())->load($serviceDataArray)
+											 ->run();
+			}
 		}
 		App::response()
 		   ->redirect('/cabinet');
@@ -123,6 +117,7 @@ class Controller extends \system\core\Controller
 
 	public function actionListChanges()
 	{
+		View::setDesign('admin');
 		$text = 'Список новых заяков на изменение личных данных';
 		View::setDesignParams(
 			[

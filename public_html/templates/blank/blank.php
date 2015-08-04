@@ -11,11 +11,12 @@ use system\core\App;
 <head>
 	<meta charset="utf-8">
 	<?=App::html()->css;?>
-	<title><?= $title ?></title>
+	<title></title>
 
 </head>
 
 <body>
+<a href="/auth/logout/">Выйти</a>
 <?= $content ?>
 <?=App::html()->jsload;?>
 </body>

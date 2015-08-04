@@ -28,9 +28,24 @@ foreach ($migrateFilesList as $file) {
 	if(in_array($fileInfo['filename'], $migrateList)){
 		continue;
 	}
-	$queryCode = file_get_contents($file);
-	echo "File: ".$file."\r\n";
-	echo "Query: ".$queryCode."\r\n";
-	ORM::rawExecute($queryCode);
-	ORM::rawExecute('INSERT INTO `migrate` (`name`) VALUES ("'.$fileInfo['filename'].'");');
+	echo $fileInfo['filename'].PHP_EOL;
+}
+if($i==0){
+	echo 'No migrates'.PHP_EOL;
+	die();
+}
+echo 'Execute '.$i.' migrates?'.PHP_EOL;
+
+if(fgets(STDIN) == 'y'){
+	foreach ($migrateFilesList as $file) {
+		$fileInfo = pathinfo($file);
+		if(in_array($fileInfo['filename'], $migrateList)){
+			continue;
+		}
+		$queryCode = file_get_contents($file);
+		echo "File: ".$file.PHP_EOL;
+		echo "Query: ".$queryCode.PHP_EOL;
+		ORM::rawExecute($queryCode);
+		ORM::rawExecute('INSERT INTO `migrate` (`name`) VALUES ("'.$fileInfo['filename'].'");');
+	}
 }

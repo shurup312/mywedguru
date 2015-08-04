@@ -14,6 +14,7 @@ use system\core\HTML\FormTag;
 abstract class Form extends Object
 {
 
+	private $errors;
 	private $__defaultParams = [];
 	protected $attributes;
 
@@ -114,6 +115,7 @@ abstract class Form extends Object
 		$attributes = $element['attributes'];
 		if (isset($element['attributes']['name'])) {
 			$attributes = ArrayHelper::merge($attributes, ['name' => $this->getFormName().'['.$element['attributes']['name'].']',]);
+			$error      = $this->getElementErrors($element);
 		}
 		$attributes = ArrayHelper::merge($attributes, $tagAttributes);
 		if ($this->$name) {
@@ -186,7 +188,9 @@ abstract class Form extends Object
 		$result = $this->__defaultParams['template'];
 		$result = str_replace('{label}', $label, $result);
 		$result = str_replace('{element}', $element, $result);
-		return str_replace('{error}', $error, $result);
+		$result = str_replace('{error}', $error, $result);
+		$result = "<span class='".($error?'has-error':'has-success')."'>".$result.'</span>';
+		return $result;
 	}
 
 	/**
@@ -252,4 +256,25 @@ abstract class Form extends Object
 	{
 		return $this->__defaultParams['formAttributes']['name'];
 	}
+
+	public function setErrors($arrayErrors)
+	{
+		$this->errors = $arrayErrors;
+	}
+
+	/**
+	 * @param $element
+	 *
+	 * @return string
+	 */
+	private function getElementErrors($element)
+	{
+		$error = '';
+		if (isset($this->errors[$element['attributes']['name']])) {
+			$error = implode('<br />', $this->errors[$element['attributes']['name']]);
+		}
+		return $error;
+	}
+
+
 }

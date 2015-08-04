@@ -193,16 +193,15 @@ $errors = $validator->getErrors();
 итого, пример кода
 $form = new AddressForm('address');
 $errors = [];
-if(isset($_GET['address'])){
-    $form->load($_GET['address']);
+if($get = App::request()->get('address')){
+    $form->load($get);
     $validator = new TestModelValidator($form);
     $validator->setScenario('save');
     if(!$validator->isValid()){
-        $errors = $validator->getErrors());
+        $form->setErrors($validator->getErrors());
     }
 }
 return $this->render('form.php', [
     'form'   => $form,
-    'errors' => $errors,
 ]);
 

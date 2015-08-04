@@ -10,7 +10,7 @@ namespace system\core\response\formats;
 interface ResponseFormatInterface
 {
 	/**
-	 * Прведение переданного контента к нужному для класса формату
+	 * РџСЂРІРµРґРµРЅРёРµ РїРµСЂРµРґР°РЅРЅРѕРіРѕ РєРѕРЅС‚РµРЅС‚Р° Рє РЅСѓР¶РЅРѕРјСѓ РґР»СЏ РєР»Р°СЃСЃР° С„РѕСЂРјР°С‚Сѓ
 	 * @param string|array|integer $content
 	 *
 	 * @return string

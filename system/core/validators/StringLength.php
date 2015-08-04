@@ -140,8 +140,7 @@ class StringLength extends AbstractValidator
         }
 
         $this->setValue($value);
-
-        $length = strlen($value);
+        $length = mb_strlen($value, 'utf-8');
         if ($length < $this->getMin()) {
             $this->error(self::TOO_SHORT);
         }

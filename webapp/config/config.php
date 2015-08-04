@@ -42,6 +42,7 @@ $projectConfig          = [
 	],
 	'defaultController' => false,
 	'loginURL'          => '/auth/',
+	'basePage'          => '/',
 	'modules'           => [
 		"adm"         => [],
 		"auth"        => [],
@@ -52,7 +53,13 @@ $projectConfig          = [
 			'thmbHeight'  => 300,
 		],
 		"creator"     => [],
-		'main'        => [],
+		'catalog'        => [
+			'modules'=>[
+				'photo'=>[
+
+				]
+			]
+		],
 		"pages"       => [
 			'routePath' => App::getPathOfAlias('webapp.modules.pages.config').'route.cfg',
 		],
@@ -78,7 +85,7 @@ $projectConfig          = [
 		'dev' => 'shurup@e-mind.ru',
 	],
 	'paths'             => [
-		'/' => '/auth'
+		'/' => '/catalog'
 	],
 ];
 $pagesRoutes            = $projectConfig['modules']['pages']['routePath'];

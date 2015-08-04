@@ -261,7 +261,7 @@ class Controller extends \system\core\Controller
 				->set('status', User::STATUS_REGISTERED)
 				->save();
 			App::response()
-			   ->redirect('/cabinet');
+			   ->redirect(App::getConfig()['basePage']);
 		}
 		return View::withDesign(
 			'register', [
@@ -311,7 +311,7 @@ class Controller extends \system\core\Controller
 			   ->redirect('/auth/step1/');
 		}
 		if(App::get('user')->status == User::STATUS_REGISTERED){
-			App::response()->redirect('/cabinet');
+			App::response()->redirect(App::getConfig()['basePage']);
 		}
 	}
 

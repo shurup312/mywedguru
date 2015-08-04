@@ -12,7 +12,7 @@ use webapp\modules\cabinet\models\UserExtend;
  * @var UserForm $form
  * @var UserExtend $user
  */
-$form->setTemplate('<div class="form-group"><label for="name">{label}</label>{element}</div>');
+$form->setTemplate('<div class="form-group"><label for="name">{label}</label>{element}{error}</div>');
 ?>
 <div class="col-xs-6">
 	<?=
