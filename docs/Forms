@@ -108,13 +108,13 @@ return $this->render('...',['form'=>$form]);
 <?=$form->getForm();?>
 
 4. В контроллере заполнить форму для повторного показа в случае ошибки ее валидации можно следующим образом
-if (isset($_POST[$formName])) {
-    $form->load($_POST[$formName]);
+if ($post = App::request()->post($formName)) {
+    $form->load($post);
 }
 Таким образом при повторном показе форма будет уже заполнена.
 
 5. У самой формы можно перед выводом задать шаблон вывода элементов
-$form->setTemplate('<div class="form-group"><label for="name">{label}</label>{element}</div>');
+$form->setTemplate('<div class="form-group {error-class}"><label for="name">{label}</label>{element}</div>');
 
 Ну и помимо всего прочего, можно выводить не форму целиком, а отдельные ее элементы в случае, если нужен ывод каждого элемента в "своем" дизайне
 Во view можно реализовать это следующим образом
@@ -143,8 +143,8 @@ $form->open(
 
 $formName = 'formName';
 $form     = new PagesForm($formName);
-if (isset($_POST[$formName])) {
-    $form->load($_POST[$formName]);
+if ($post = App::request()->post($formName)) {
+    $form->load($post);
     $menuName = $form->menu_name;
     ...
 

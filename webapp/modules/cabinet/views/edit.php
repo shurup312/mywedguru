@@ -12,7 +12,7 @@ use webapp\modules\cabinet\models\UserExtend;
  * @var UserForm $form
  * @var UserExtend $user
  */
-$form->setTemplate('<div class="form-group"><label for="name">{label}</label>{element}{error}</div>');
+$form->setTemplate('<div class="form-group {error-class}"><label for="name">{label}</label>{element}{error}</div>');
 ?>
 <div class="col-xs-6">
 	<?=
@@ -26,7 +26,7 @@ $form->setTemplate('<div class="form-group"><label for="name">{label}</label>{el
 </div>
 <div class="col-xs-6">
 	<? if(isset($user['avatar'])){ ?>
-		<div class="aler">
+		<div class="alert">
 			Если необходимо сменить фотографию, то просто загрузите другую.
 		</div>
 		<img src="/public/components/cabinet/<?= $user['avatar']; ?>" alt=""/><?

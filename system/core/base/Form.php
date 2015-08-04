@@ -189,7 +189,7 @@ abstract class Form extends Object
 		$result = str_replace('{label}', $label, $result);
 		$result = str_replace('{element}', $element, $result);
 		$result = str_replace('{error}', $error, $result);
-		$result = "<span class='".($error?'has-error':'has-success')."'>".$result.'</span>';
+		$result = str_replace('{error-class}', ($error?'has-error':'has-success'), $result);
 		return $result;
 	}
 
