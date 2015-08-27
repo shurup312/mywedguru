@@ -6,7 +6,7 @@ return [
     'name' => 'Школа бортпроводников',
     'language'       => 'ru-RU',
     'sourceLanguage' => 'ru-RU',
-    'basePath'            => dirname(__DIR__),
+    'basePath'            => '/',
     'bootstrap'           => ['log'],
     'controllerNamespace' => 'frontend\controllers',
     'components'          => [
