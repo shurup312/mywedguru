@@ -3,13 +3,16 @@ $params = array_merge(require(__DIR__.'/../../common/config/params.php'), requir
     require(__DIR__.'/params-local.php'));
 return [
     'id'                  => 'app-frontend',
-    'name' => 'Школа бортпроводников',
-    'language'       => 'ru-RU',
-    'sourceLanguage' => 'ru-RU',
-    'basePath'            => '/',
+    'name'                => 'Школа бортпроводников',
+    'language'            => 'ru-RU',
+    'sourceLanguage'      => 'ru-RU',
+    'basePath'            => dirname(__DIR__),
     'bootstrap'           => ['log'],
     'controllerNamespace' => 'frontend\controllers',
     'components'          => [
+        'request'      => [
+            'baseUrl' => '/',
+        ],
         'user'         => [
             'identityClass'   => 'frontend\models\User',
             'enableAutoLogin' => true,
@@ -31,6 +34,7 @@ return [
             'errorAction' => 'site/error',
         ],
         'urlManager'   => [
+            'baseUrl'         => '/',
             'enablePrettyUrl' => true,
             'showScriptName'  => false,
             'rules'           => [
