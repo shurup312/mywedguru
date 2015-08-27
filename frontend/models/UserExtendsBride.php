@@ -41,7 +41,6 @@ class UserExtendsBride extends ActiveRecord
             [['date_created', 'date_deleted'], 'safe'],
             [['first_name', 'fiance_first_name', 'last_name', 'fiance_last_name'], 'string', 'max' => 255],
             [['avatar'], 'string', 'max' => 64],
-            [['date_birth', 'date_wedding'], 'date', 'format' => 'Y-m-d'],
         ];
     }
 

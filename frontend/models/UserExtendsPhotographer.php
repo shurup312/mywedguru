@@ -44,8 +44,6 @@ class UserExtendsPhotographer extends \yii\db\ActiveRecord
             [['about'], 'string'],
             [['first_name', 'last_name', 'studio_name', 'site_name', 'email', 'phone'], 'string', 'max' => 255],
             [['avatar'], 'string', 'max' => 64],
-            [['date_birth'], 'date','format'=>'Y-m-d'],
-
         ];
     }
 
