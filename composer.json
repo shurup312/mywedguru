@@ -15,9 +15,13 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">=5.4.0",
-        "yiisoft/yii2": ">=2.0.6",
+        "yiisoft/yii2": ">=2.0.5",
         "yiisoft/yii2-bootstrap": "*",
         "yiisoft/yii2-swiftmailer": "*",
+        "shurup312/image-helper": "1.0",
+        "2amigos/yii2-ckeditor-widget": "~1.0",
+        "iutbay/yii2-kcfinder": "master",
+        "iutbay/yii2-fontawesome" : "master",
         "yiisoft/yii2-jui": "~2.0.0"
     },
     "require-dev": {
