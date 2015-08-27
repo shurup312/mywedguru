@@ -67,8 +67,12 @@ class UserExtendsBride extends ActiveRecord
 
     public function beforeValidate()
     {
-        $this->date_birth = (new DateTime($this->date_birth))->format('Y-m-d');
-        $this->date_wedding= (new DateTime($this->date_wedding))->format('Y-m-d');
+        if ($this->date_birth) {
+            $this->date_birth = (new DateTime($this->date_birth))->format('Y-m-d');
+        }
+        if($this->date_wedding){
+            $this->date_wedding= (new DateTime($this->date_wedding))->format('Y-m-d');
+        }
         return parent::beforeValidate();
     }
 }

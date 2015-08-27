@@ -48,6 +48,7 @@ class DefaultController extends Controller
                         'socialid' => $userData->user_id
                     ])
                     ->one();
+
         if (!$user) {
             $user           = new User();
             $user->site     = User::SITE_VK;

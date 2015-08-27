@@ -73,7 +73,9 @@ class UserExtendsPhotographer extends \yii\db\ActiveRecord
 
     public function beforeValidate()
     {
-        $this->date_birth = (new DateTime($this->date_birth))->format('Y-m-d');
+        if($this->date_birth){
+            $this->date_birth = (new DateTime($this->date_birth))->format('Y-m-d');
+        }
         return parent::beforeValidate();
     }
 }
