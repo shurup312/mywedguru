@@ -22,13 +22,13 @@ class UserFactory extends Object
 	 */
 	public static function getCurrentModel()
 	{
-		return static::getModelNameByType(\yii::$app->getUser()->identity->user_type);
+		return static::getModelByType(\yii::$app->getUser()->identity->user_type);
 	}
 
-	public static function getModelNameByType($typeID)
+	public static function getModelByType($typeID)
 	{
 		switch($typeID){
-			case userType::USER_BRIDE:
+			case UserType::USER_BRIDE:
 				return new UserExtendsBride();
 			case UserType::USER_PHOTOGRAPGER:
 				return new UserExtendsPhotographer();

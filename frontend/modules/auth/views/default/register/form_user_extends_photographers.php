@@ -19,6 +19,8 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'first_name') ?>
 
     <?= $form->field($model, 'last_name') ?>
+    <?= $form->field($model, 'email') ?>
+    <?= $form->field($model, 'phone') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Отправить', ['class' => 'btn btn-primary']) ?>

@@ -11,6 +11,11 @@ use yii\base\Model;
 
 class UserType extends Model
 {
-	const USER_BRIDE = 1;
-	const USER_PHOTOGRAPGER = 2;
+
+    const USER_BRIDE = 1;
+    const USER_PHOTOGRAPGER = 2;
+    public static $prefix = [
+        self::USER_BRIDE        => 'bride',
+        self::USER_PHOTOGRAPGER => 'photographer',
+    ];
 }

@@ -10,6 +10,7 @@ namespace common\services;
 abstract class Service {
 
 	protected $results = null;
+	private $errors = [];
 
 	public function __construct () {
 	}
@@ -47,4 +48,19 @@ abstract class Service {
 		}
 		return $this;
 	}
+
+    public function addError($message)
+    {
+        $this->errors[] = $message;
+    }
+
+    public function hasErrors()
+    {
+        return !empty($this->errors);
+    }
+
+    public function getErrors()
+    {
+        return $this->errors;
+    }
 }

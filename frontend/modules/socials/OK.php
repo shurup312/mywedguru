@@ -49,7 +49,7 @@ class OK extends Object
 		if($accessToken){
 			return $accessToken;
 		}
-		$link     = 'https://api.odnoklassniki.ru/oauth/token.do?refresh_token='.\yii::$app->cuser->token.'&client_id='.$config['APPID'].'&client_secret='.$config['PRIVATE_KEY'].'&grant_type=refresh_token';
+		$link     = 'https://api.odnoklassniki.ru/oauth/token.do?refresh_token='.\Yii::$app->session->get('USER')->token.'&client_id='.$config['APPID'].'&client_secret='.$config['PRIVATE_KEY'].'&grant_type=refresh_token';
 		$response = json_decode(self::request($link));
 		if(isset($response->access_token)){
 			$accessToken = $response->access_token;
