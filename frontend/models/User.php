@@ -1,43 +1,34 @@
 <?php
-
 namespace frontend\models;
 
-use frontend\models\abstracts\UserFactory;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 
 /**
  * This is the model class for table "users".
- *
  * @property integer $id
- * @property integer $rights
  * @property integer $site
- * @property string $socialid
- * @property string $token
+ * @property string  $socialid
+ * @property string  $token
  * @property integer $status
- * @property integer $user_type
- * @property string $date_created
- * @property string $date_deleted
- * @property UserExtendsPhotographer|UserExtendsBride $userExtend
+ * @property integer $type
+ * @property string  $avatar
+ * @property string  $date_created
+ * @property string  $date_deleted
  */
 class User extends ActiveRecord implements IdentityInterface
 {
-    const SUPER_RIGHTS = 0b00001;
-   	const ADMIN_RIGHTS = 0b00010;
-   	const USER_RIGHTS = 0b00100;
-   	const GUEST_RIGHTS = 0b01000;
 
-   	const STATUS_SOCIAL_APPROVE = 1;
-   	const STATUS_TYPE_USER_SELECT = 2;
-   	const STATUS_REGISTERED = 3;
+    const STATUS_SOCIAL_APPROVE = 1;
+    const STATUS_TYPE_USER_SELECT = 2;
+    const STATUS_REGISTERED = 3;
+    const SITE_VK = 1;
+    const SITE_OK = 2;
+    const SITE_FB = 3;
+    const USER_TYPE_BRIDE = 1; //невесты
+    const USER_TYPE_PHOTOGRAPHER = 2; //фотограф
 
-   	const SITE_VK = 1;
-   	const SITE_OK = 2;
-   	const SITE_FB = 3;
-
-   	const USER_TYPE_BRIDE = 1; //невесты
-   	const USER_TYPE_PHOTOGRAPHER = 2; //фотограф
     /**
      * @inheritdoc
      */
@@ -52,8 +43,8 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['rights', 'site', 'token'], 'required'],
-            [['rights', 'site', 'status', 'user_type'], 'integer'],
+            [['site', 'token'], 'required'],
+            [['site', 'avatar', 'status', 'user_type'], 'integer'],
             [['date_created', 'date_deleted'], 'safe'],
             [['socialid'], 'string', 'max' => 64],
         ];
@@ -65,13 +56,13 @@ class User extends ActiveRecord implements IdentityInterface
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'rights' => 'Права пользователя',
-            'site' => 'ID соцсети',
-            'socialid' => 'ID пользователя в соцсети',
-            'token' => 'Токен для доступа к соц.сети',
-            'status' => 'Статус регистрации пользователя',
-            'user_type' => 'Тип пользователя',
+            'id'           => 'ID',
+            'avatar'       => 'Аватарка',
+            'site'         => 'ID соцсети',
+            'socialid'     => 'ID пользователя в соцсети',
+            'token'        => 'Токен для доступа к соц.сети',
+            'status'       => 'Статус регистрации пользователя',
+            'type'         => 'Тип пользователя',
             'date_created' => 'Date Created',
             'date_deleted' => 'Date Deleted',
         ];
@@ -142,13 +133,5 @@ class User extends ActiveRecord implements IdentityInterface
     public function validateAuthKey($authKey)
     {
         // TODO: Implement validateAuthKey() method.
-
-    }
-
-    public function getUserExtend()
-    {
-        $manClass = UserFactory::getCurrentModel();
-        $reflectionClass = new \ReflectionClass($manClass);
-        return $this->hasOne($reflectionClass->name, ['user_id' => 'id']);
     }
 }

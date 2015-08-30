@@ -1,0 +1,18 @@
+<?
+namespace app\modules\entities;
+
+class User
+{
+
+    const TYPE_BRIDE = 1;
+    const TYPE_PHOTOGRAPHER = 2;
+    public $id;
+    public $site;
+    public $socialID;
+    public $token;
+    public $status;
+    public $type;
+    public $avatar;
+    public $dateCreated;
+    public $dateDeleted;
+}
