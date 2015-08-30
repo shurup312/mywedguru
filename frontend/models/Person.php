@@ -19,7 +19,7 @@ use Yii;
  * @property string  $about
  * @property string  $date_created
  * @property string  $date_deleted
- * @property Users   $user
+ * @property User    $user
  */
 class Person extends \yii\db\ActiveRecord
 {

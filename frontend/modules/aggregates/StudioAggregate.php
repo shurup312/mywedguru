@@ -7,9 +7,28 @@
  */
 namespace app\modules\aggregates;
 
+use frontend\models\Studio;
+use frontend\models\StudioOwner;
+
 class StudioAggregate
 {
+
     public $studio;
-    public $studioOwner;
-    public $contact;
+    private $studioOwner;
+
+    public function __construct(Studio $studio, StudioOwner $studioOwner)
+    {
+        $this->studio      = $studio;
+        $this->studioOwner = $studioOwner;
+    }
+
+    public function studio()
+    {
+        return $this->studio;
+    }
+
+    public function studioOwner()
+    {
+        return $this->studioOwner;
+    }
 }

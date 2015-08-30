@@ -6,20 +6,20 @@ use yii\db\Migration;
 class m150827_090835_AddColumns_UserExtendsPhotographer extends Migration
 {
 
-    public function up()
+    public function safeUp()
     {
-        $this->addColumn(UserExtendsPhotographer::tableName(), 'about', $this->text().' NULL DEFAULT NULL COMMENT "О себе"');
-        $this->addColumn(UserExtendsPhotographer::tableName(), 'date_birth', $this->timestamp().' NULL DEFAULT NULL COMMENT "Дата рождения"');
-        $this->addColumn(UserExtendsPhotographersHistory::tableName(), 'about', $this->text().' NULL DEFAULT NULL COMMENT "О себе"');
-        $this->addColumn(UserExtendsPhotographersHistory::tableName(), 'date_birth', $this->timestamp().' NULL DEFAULT NULL COMMENT "Дата рождения"');
+        $this->addColumn('user_extends_photographers', 'about', $this->text().' NULL DEFAULT NULL COMMENT "О себе"');
+        $this->addColumn('user_extends_photographers', 'date_birth', $this->timestamp().' NULL DEFAULT NULL COMMENT "Дата рождения"');
+        $this->addColumn('user_extends_photographers_history', 'about', $this->text().' NULL DEFAULT NULL COMMENT "О себе"');
+        $this->addColumn('user_extends_photographers_history', 'date_birth', $this->timestamp().' NULL DEFAULT NULL COMMENT "Дата рождения"');
     }
 
-    public function down()
+    public function safeDown()
     {
-        $this->dropColumn(UserExtendsPhotographer::tableName(), 'about');
-        $this->dropColumn(UserExtendsPhotographer::tableName(), 'date_birth');
-        $this->dropColumn(UserExtendsPhotographersHistory::tableName(), 'about');
-        $this->dropColumn(UserExtendsPhotographersHistory::tableName(), 'date_birth');
+        $this->dropColumn('user_extends_photographers', 'about');
+        $this->dropColumn('user_extends_photographers', 'date_birth');
+        $this->dropColumn('user_extends_photographers_history', 'about');
+        $this->dropColumn('user_extends_photographers_history', 'date_birth');
     }
     /*
     // Use safeUp/safeDown to run migration code within a transaction

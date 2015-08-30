@@ -17,5 +17,6 @@ class Studio
 {
     public $id;
     public $name;
-    public $contactID;
+    public $phone;
+    public $address;
 }

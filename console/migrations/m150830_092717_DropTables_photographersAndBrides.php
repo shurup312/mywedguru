@@ -7,10 +7,10 @@ class m150830_092717_DropTables_photographersAndBrides extends Migration
 {
     public function up()
     {
-        $this->dropTable(\frontend\models\UserExtendsPhotographer::tableName());
-        $this->dropTable(\frontend\models\UserExtendsPhotographersHistory::tableName());
-        $this->dropTable(\frontend\models\UserExtendsBride::tableName());
-        $this->dropTable(\frontend\models\UserExtendsBridesHistory::tableName());
+        $this->dropTable('user_extends_brides_history');
+        $this->dropTable('user_extends_brides');
+        $this->dropTable('user_extends_photographers_history');
+        $this->dropTable('user_extends_photographers');
         $this->dropTable('user');
     }
 
@@ -20,15 +20,4 @@ class m150830_092717_DropTables_photographersAndBrides extends Migration
 
         return true;
     }
-
-    /*
-    // Use safeUp/safeDown to run migration code within a transaction
-    public function safeUp()
-    {
-    }
-
-    public function safeDown()
-    {
-    }
-    */
 }

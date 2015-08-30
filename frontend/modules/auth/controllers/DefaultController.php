@@ -1,8 +1,10 @@
 <?php
 namespace frontend\modules\auth\controllers;
 
-use frontend\models\abstracts\UserFactory;
+use app\modules\factories\PersonFactory;
+use app\modules\repositories\PersonRepository;
 use frontend\models\User;
+use frontend\models\UserType;
 use frontend\modules\auth\services\UpdateUserDataService;
 use frontend\modules\socials\FB;
 use frontend\modules\socials\fb\FacebookRedirectLoginHelper;
@@ -36,9 +38,11 @@ class DefaultController extends Controller
         if (\yii::$app->request->get('error') || is_null(\yii::$app->request->get('code'))) {
             \yii::$app->response->redirect(\yii::$app->params['loginURL']);
         }
-        $code     = \yii::$app->request->get('code');
-        $config   = \yii::$app->params['vkAPI'];
-        $userData = VK::getUserToken($config, $code);
+        $code   = \yii::$app->request->get('code');
+        $config = \yii::$app->params['vkAPI'];
+        if (!$userData = VK::getUserToken($config, $code)) {
+            \Yii::$app->response->redirect('/auth');
+        }
         if (!$userData->access_token) {
             \yii::$app->response->redirect('/auth');
         }
@@ -48,12 +52,10 @@ class DefaultController extends Controller
                         'socialid' => $userData->user_id
                     ])
                     ->one();
-
         if (!$user) {
             $user           = new User();
             $user->site     = User::SITE_VK;
             $user->status   = User::STATUS_SOCIAL_APPROVE;
-            $user->rights   = User::USER_RIGHTS;
             $user->socialid = (string)$userData->user_id;
             $user->token    = (string)$userData->access_token;
             $isSaved        = $user->save();
@@ -94,7 +96,6 @@ class DefaultController extends Controller
             $user           = new User();
             $user->site     = User::SITE_OK;
             $user->status   = User::STATUS_SOCIAL_APPROVE;
-            $user->rights   = User::USER_RIGHTS;
             $user->socialid = (string)$currentUser->uid;
             $user->token    = (string)$userData->refresh_token;
             $isSaved        = $user->save();
@@ -140,7 +141,6 @@ class DefaultController extends Controller
             $user           = new User();
             $user->site     = User::SITE_FB;
             $user->status   = User::STATUS_SOCIAL_APPROVE;
-            $user->rights   = User::USER_RIGHTS;
             $user->socialid = (string)$currentUser->getId();
             $user->token    = $session->getAccessToken();
             $isSaved        = $user->save();
@@ -158,7 +158,7 @@ class DefaultController extends Controller
     public function actionChecktype()
     {
         $this->validateSocialNetwork();
-        $userType = \Yii::$app->session->get('USER')->user_type;
+        $userType = \Yii::$app->session->get('USER')->type;
         if ($userType && \Yii::$app->session->get('USER')->status==User::STATUS_REGISTERED) {
             \Yii::$app->response->redirect('/auth/step1/'.$userType);
             \Yii::$app->end();
@@ -173,11 +173,11 @@ class DefaultController extends Controller
             \yii::$app->response->redirect('/auth');
         }
         $registrationUser = \Yii::$app->session->get('USER');
-        if ($registrationUser->user_type && $registrationUser->status==User::STATUS_REGISTERED) {
+        if ($registrationUser->type && $registrationUser->status==User::STATUS_REGISTERED) {
             \yii::$app->response->redirect('/auth/step2');
         }
-        $currentUser            = $registrationUser;
-        $currentUser->user_type = $userType;
+        $currentUser       = $registrationUser;
+        $currentUser->type = $userType;
         $currentUser->save();
         \yii::$app->response->redirect('/auth/step2');
         \Yii::$app->end();
@@ -187,16 +187,15 @@ class DefaultController extends Controller
     {
         $this->validateSocialNetwork();
         $this->validateRegistrationStep();
-        $site              = $this->getSocialNetwork();
-        $userSocialID      = \Yii::$app->session->get('USER')->socialid;
-        $userData          = $site->getUser($userSocialID);
-        $currentUser = \Yii::$app->session->get('USER');
-        $model             = UserFactory::getModelByType($currentUser->user_type);
-        $model->first_name = $userData->first_name;
-        $model->last_name  = $userData->last_name;
-        $model->user_id    = $currentUser->id;
-        if ($model->load(\yii::$app->request->post())) {
-            $this->saveUserData($currentUser, $model);
+        $site         = $this->getSocialNetwork();
+        $userSocialID = \Yii::$app->session->get('USER')->socialid;
+        $userData     = $site->getUser($userSocialID);
+        $currentUser  = \Yii::$app->session->get('USER');
+        if(!$model = PersonRepository::getByUserId($currentUser->id)){
+            $personFactory    = (new PersonFactory($currentUser));
+            $model = $personFactory->create($userData->first_name, $userData->last_name);
+        }
+        if ($model->load(\yii::$app->request->post()) && PersonRepository::save($model)) {
             /**
              * @var User $currentUser
              */
@@ -204,10 +203,10 @@ class DefaultController extends Controller
             $currentUser->save();
             \yii::$app->user->login($currentUser);
             \yii::$app->session->remove('USER');
-            \yii::$app->response->redirect(URL::toRoute('/cabinet'));
+            \yii::$app->response->redirect(URL::toRoute('/userDetails'));
             \Yii::$app->end();
         }
-        $viewName = 'register/form_'.$model->tableName();
+        $viewName = 'form';
         return $this->render($viewName, [
             'model' => $model,
         ]);
@@ -229,7 +228,7 @@ class DefaultController extends Controller
         if (\Yii::$app->session->get('USER')->status==User::STATUS_REGISTERED) {
             \yii::$app->user->login(\Yii::$app->session->get('USER'));
             \Yii::$app->session->remove('USER');
-            \yii::$app->response->redirect(URL::toRoute('/cabinet'));
+            \yii::$app->response->redirect(URL::toRoute('/userDetails'));
             \Yii::$app->end();
         }
     }
@@ -255,20 +254,5 @@ class DefaultController extends Controller
             \yii::$app->response->redirect('/auth');
         }
         return $site;
-    }
-
-    protected function saveUserData($userModel, $userExtendsModel)
-    {
-        $serviceDataArray      = [
-            'userModel'          => $userModel,
-            'userExtensionModel' => $userExtendsModel,
-            'isModerate'         => false,
-        ];
-        $updateUserDataService = new UpdateUserDataService();
-        if (!$updateUserDataService->load($serviceDataArray)
-                                   ->run()
-        ) {
-            throw new Exception(implode("<br />", $updateUserDataService->getErrors()));
-        }
     }
 }

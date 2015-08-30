@@ -1,6 +1,7 @@
 <?php
 namespace app\modules\cabinet\controllers;
 
+use app\modules\repositories\PersonRepository;
 use frontend\models\User;
 use frontend\models\UserType;
 use yii\filters\AccessControl;
@@ -28,9 +29,8 @@ class DefaultController extends Controller
         /**
          * @var User $userModel
          */
-        $userModel       = \Yii::$app->getUser()->identity;
-        $userExtendModel = $userModel->userExtend;
-        return $this->render(UserType::$prefix[$userModel->user_type].'/index', ['userExtendModel' => $userExtendModel]);
+        $personModel = PersonRepository::getByUserId(\Yii::$app->getUser()->identity->getId());
+        return $this->render(UserType::$prefix[\Yii::$app->getUser()->identity->type].'/index', ['personModel' => $personModel]);
     }
 
     public function actionEdit()

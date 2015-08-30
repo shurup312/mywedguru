@@ -44,7 +44,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             [['site', 'token'], 'required'],
-            [['site', 'avatar', 'status', 'user_type'], 'integer'],
+            [['site', 'avatar', 'status', 'type'], 'integer'],
             [['date_created', 'date_deleted'], 'safe'],
             [['socialid'], 'string', 'max' => 64],
         ];

@@ -9,7 +9,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 
 /**
- * @var \frontend\models\UserExtendsPhotographer $userExtendModel
+ * @var Person $personModel
  */
 ?>
 <h3><?= $userExtendModel->last_name; ?> <?= $userExtendModel->first_name; ?></h3>
