@@ -8,25 +8,25 @@
 namespace app\modules\repositories;
 
 use frontend\models\Person;
+use frontend\models\User;
 
-class PersonRepository
+class PersonRepository extends Repository
 {
 
     /**
-     * @param $userID
+     * @param User $user
      *
      * @return Person|null
      */
-    public static function getByUserId($userID){
-        return Person::findOne($userID);
+    public function getByUser(User $user){
+        return Person::findOne($user->id);
     }
-
     /**
      * @param Person $model
      *
      * @return bool
      */
-    public static function save(Person &$model)
+    public function save(Person $model)
     {
         return $model->save();
     }

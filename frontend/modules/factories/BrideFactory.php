@@ -8,16 +8,15 @@
 namespace app\modules\factories;
 
 use app\modules\aggregates\BrideAggregate;
-use app\modules\entities\Wedding;
 use frontend\models\Person;
 use frontend\models\User;
+use frontend\models\Wedding;
 
 /**
  * @property BrideAggregate aggregate
  */
 class BrideFactory
 {
-
     private $user;
 
     public function __construct(User $user)
@@ -35,32 +34,42 @@ class BrideFactory
     {
         $bride = $this->createBride($firstName, $lastName);
         $groom = $this->createGroom();
-        $this->createWedding($bride, $groom);
-        return $bride;
+        $wedding = $this->createWedding();
+        $brideAggregate = new BrideAggregate($bride, $groom, $wedding);
+        return $brideAggregate;
     }
 
+    /**
+     * @param $firstName
+     * @param $lastName
+     *
+     * @return Person
+     */
     private function createBride($firstName, $lastName)
     {
         $bride             = new Person();
         $bride->user_id    = $this->user->id;
         $bride->first_name = $firstName;
         $bride->last_name  = $lastName;
-        $bride->save();
         return $bride;
     }
 
+    /**
+     * @return Person
+     */
     private function createGroom()
     {
-        $groom = new Person();
-        $groom->save();
+        $groom             = new Person();
         return $groom;
     }
 
-    private function createWedding(Person $bride, Person $groom)
+    /**
+     * @return Wedding
+     */
+    private function createWedding()
     {
-        $wedding          = new Wedding();
-        $wedding->brideID = $bride->id;
-        $wedding->groomID = $groom->id;
+        $wedding             = new Wedding();
+        return $wedding;
     }
 }
 /**

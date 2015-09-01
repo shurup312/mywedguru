@@ -7,6 +7,8 @@
  */
 namespace app\modules\factories;
 
+use app\modules\aggregates\PhotographerAggregate;
+use app\modules\aggregates\StudioAggregate;
 use frontend\models\Person;
 use frontend\models\User;
 
@@ -29,8 +31,10 @@ class PhotographerFactory
     public function create($firstName, $lastName)
     {
         $photograper = $this->createPhotographer($firstName, $lastName);
+        $studioAggregate = $this->createStudio($photograper);
         $this->createPhotogallery();
-        return $photograper;
+        $aggregate = new PhotographerAggregate($photograper, $studioAggregate, null);
+        return $aggregate;
     }
 
     private function createPhotographer($firstName, $lastName)
@@ -39,12 +43,21 @@ class PhotographerFactory
         $photographer->user_id    = $this->user->id;
         $photographer->first_name = $firstName;
         $photographer->last_name  = $lastName;
-        $photographer->save();
         return $photographer;
     }
 
     private function createPhotogallery()
     {
+    }
+
+    /**
+     * @param Person $photographer
+     *
+     * @return StudioAggregate
+     */
+    private function createStudio(Person $photographer)
+    {
+        return (new StudioFactory())->create($photographer);
     }
 }
 /**

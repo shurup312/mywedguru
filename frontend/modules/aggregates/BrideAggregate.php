@@ -7,22 +7,21 @@
  */
 namespace app\modules\aggregates;
 
-use app\modules\entities\Wedding;
 use frontend\models\Person;
+use frontend\models\Wedding;
 
 /**
  * Class BrideAggregate
+ *
  * @package app\modules\aggregates
  * @property Person  $bride
  * @property Person  $groom
  * @property Wedding $wedding
  */
-class BrideAggregate
+class BrideAggregate extends Aggregate
 {
-
-    private $bride;
-    private $groom;
-    private $wedding;
+    protected $groom;
+    protected $wedding;
 
     /**
      * @param Person  $bride
@@ -31,7 +30,7 @@ class BrideAggregate
      */
     public function __construct(Person $bride, Person $groom, Wedding $wedding)
     {
-        $this->bride   = $bride;
+        $this->root    = $bride;
         $this->groom   = $groom;
         $this->wedding = $wedding;
         return $this;
@@ -42,6 +41,16 @@ class BrideAggregate
      */
     public function bride()
     {
-        return $this->bride;
+        return $this->root();
+    }
+
+    public function groom()
+    {
+        return $this->groom;
+    }
+
+    public function wedding()
+    {
+        return $this->wedding;
     }
 }

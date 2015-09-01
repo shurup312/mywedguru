@@ -14,14 +14,27 @@ use app\modules\repositories\StudioRepository;
 use frontend\models\User;
 use frontend\models\UserType;
 
+/**
+ * Class GetPhotographerAggregateService
+ * @package app\modules\services
+ *
+ * @property User $user
+ * @property PersonRepository $personRepository
+ * @property StudioRepository $studioRepository
+ */
 class GetPhotographerAggregateService
 {
     private $user;
-    public function __construct(User $user)
+    private $personRepository;
+    private $studioRepository;
+
+    public function __construct(User $user, PersonRepository $personRepository, StudioRepository $studioRepository)
     {
         if($user->type!=UserType::USER_PHOTOGRAPGER){
             throw new ServiceException('Переданный пользователь не является фотографом');
         }
+        $this->personRepository = $personRepository;
+        $this->studioRepository = $studioRepository;
         $this->user = $user;
     }
 
@@ -30,8 +43,8 @@ class GetPhotographerAggregateService
      */
     public function execute()
     {
-        $person = PersonRepository::getByUserId($this->user->id);
-        $studio = StudioRepository::getByPerson($person);
+        $person = $this->personRepository->getByUser($this->user);
+        $studio = $this->studioRepository->getByPerson($person);
         return new PhotographerAggregate($person, $studio, null);
     }
 }

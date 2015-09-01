@@ -7,7 +7,12 @@
  */
 namespace app\modules\factories;
 
+use app\modules\aggregates\BrideAggregate;
+use app\modules\aggregates\PhotographerAggregate;
+use app\modules\exceptions\FactoryException;
+use app\modules\repositories\PersonRepository;
 use Exception;
+use frontend\models\Person;
 use frontend\models\User;
 use frontend\models\UserType;
 
@@ -26,6 +31,9 @@ class PersonFactory
      */
     public function __construct(User $user)
     {
+        if(!$user->id){
+            throw new FactoryException('Передан неуникализированный пользователь');
+        }
         $this->user = $user;
     }
 
@@ -33,22 +41,15 @@ class PersonFactory
      * @param $firstName
      * @param $lastName
      *
-     * @return \frontend\models\Person
+     * @return Person
      * @throws Exception
      */
     public function create($firstName, $lastName)
     {
-        $result = null;
-        switch ($this->user->type) {
-            case UserType::USER_BRIDE:
-                $result = (new BrideFactory($this->user))->create($firstName, $lastName);
-                break;
-            case UserType::USER_PHOTOGRAPGER:
-                $result = (new PhotographerFactory($this->user))->create($firstName, $lastName);
-        }
-        if ($result===null) {
-            throw new Exception('У пользователя указан неверный тип.');
-        }
-        return $result;
+        $person = new Person();
+        $person->user_id = $this->user->id;
+        $person->first_name = $firstName;
+        $person->last_name = $lastName;
+        return $person;
     }
 }

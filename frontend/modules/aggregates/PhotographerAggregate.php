@@ -7,47 +7,56 @@
  */
 namespace app\modules\aggregates;
 
-use app\modules\entities\Photogallery;
 use app\modules\exceptions\AggregateException;
 use frontend\models\Person;
+use frontend\models\Photogallery;
 
 /**
  * Class PhotographerAggregate
- * @package app\modules\aggregates
  *
- * @property Person $person
+ * @package app\modules\aggregates
+ * @property Person               $person
  * @property StudioAggregate|null $studioAggregate
- * @property Photogallery|null $photogallery
+ * @property Photogallery|null    $photogallery
  */
-class PhotographerAggregate
+class PhotographerAggregate extends Aggregate
 {
-    public $photographer;
-    private $studioAggregate;
-    private $photogallery;
+
+    protected $studioAggregate;
+    protected $photogalleryAggregate;
 
     public function __construct(Person $person, $studioAggregate, $photogallery)
     {
-        $this->photographer = $person;
-        if($studioAggregate !== null && !($studioAggregate instanceof StudioAggregate)){
+        $this->root = $person;
+        if ($studioAggregate !== null && !($studioAggregate instanceof StudioAggregate)) {
             throw new AggregateException('Переданный параметр не является студией');
         }
-        if($photogallery !== null && !($photogallery instanceof Photogallery)){
+        if ($photogallery !== null && !($photogallery instanceof PhotogalleryAggregate)) {
             throw new AggregateException('Переданный параметр не является фотогалереей');
         }
     }
 
+    /**
+     * @return Person
+     */
     public function photographer()
     {
-        return $this->photographer;
+        return $this->root();
     }
 
+    /**
+     * @return StudioAggregate|null
+     */
     public function studioAggregate()
     {
         return $this->studioAggregate;
     }
 
-    public function photogallery()
+    /**
+     * @return Photogallery|null
+     */
+    public function photogalleryAggregate()
     {
-        return $this->photogallery;
+        return $this->photogalleryAggregate;
     }
 }

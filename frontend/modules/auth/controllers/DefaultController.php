@@ -191,11 +191,16 @@ class DefaultController extends Controller
         $userSocialID = \Yii::$app->session->get('USER')->socialid;
         $userData     = $site->getUser($userSocialID);
         $currentUser  = \Yii::$app->session->get('USER');
-        if(!$model = PersonRepository::getByUserId($currentUser->id)){
+        $personRepository = new PersonRepository();
+        if(!$model = $personRepository->getByUser($currentUser)){
             $personFactory    = (new PersonFactory($currentUser));
             $model = $personFactory->create($userData->first_name, $userData->last_name);
         }
-        if ($model->load(\yii::$app->request->post()) && PersonRepository::save($model)) {
+        if(!$model->validate('user_id')){
+            \Yii::$app->session->remove('USER');
+            \Yii::$app->response->redirect('/auth');
+        }
+        if ($model->load(\yii::$app->request->post()) && $model->validate() && $personRepository->save($model)) {
             /**
              * @var User $currentUser
              */

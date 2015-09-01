@@ -7,15 +7,27 @@
  */
 namespace app\modules\repositories;
 
-use app\modules\aggregates\ProtogalleryAggregate;
+use app\modules\aggregates\PhotogalleryAggregate;
+use frontend\models\Photogallery;
+use frontend\models\User;
 
-class PhotogalleryRepository
+class PhotogalleryRepository extends Repository
 {
-    public static function getByUserID($userID){
-        $result = new ProtogalleryAggregate();
+
+    /**
+     * @param User $user
+     *
+     * @return PhotogalleryAggregate|null
+     */
+    public static function getByUser(User $user)
+    {
         /**
-         * TODO:
+         * @var Photogallery $photogallery
          */
-        return $result;
+        $photogallery = Photogallery::find()->where(['user_id' => $user->id]);
+        if(!$photogallery){
+            return null;
+        }
+        return $photogallery;
     }
 }

@@ -1,6 +1,9 @@
 <?php
 namespace app\modules\userDetails\controllers;
 
+use app\modules\factories\StudioFactory;
+use app\modules\repositories\PersonRepository;
+use app\modules\repositories\StudioRepository;
 use app\modules\services\GetPhotographerAggregateService;
 use frontend\models\UserType;
 use yii\filters\AccessControl;
@@ -28,7 +31,7 @@ class PhotographerController extends Controller
 
     public function actionIndex()
     {
-        $service      = new GetPhotographerAggregateService(\Yii::$app->getUser()->identity);
+        $service      = new GetPhotographerAggregateService(\Yii::$app->getUser()->identity, new PersonRepository(), new StudioRepository());
         $photographer = $service->execute();
         if ($photographer->studioAggregate()!==null) {
             \Yii::$app->response->redirect('/photographer');
@@ -37,8 +40,14 @@ class PhotographerController extends Controller
         /**
          * TODO: сделать форму для студии
          */
-        return $this->render('studio', [
-            'studio' => null,
-        ]);
+        $studioAggregate = (new StudioFactory())->create($photographer->root());
+        $studio          = $studioAggregate->root();
+        if ($studio->load(\Yii::$app->request->post()) && $studio->validate()) {
+            $studioAggregate->setStudio($studio);
+            if ($studioAggregate->save(new StudioRepository())) {
+
+            }
+        }
+        return $this->render('studio', ['studio' => $studioAggregate->root(),]);
     }
 }

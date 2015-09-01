@@ -8,24 +8,28 @@
 namespace app\modules\repositories;
 
 use app\modules\aggregates\StudioAggregate;
+use app\modules\factories\StudioFactory;
 use frontend\models\Person;
+use frontend\models\Studio;
 use frontend\models\StudioOwner;
 
-class StudioRepository
+class StudioRepository extends Repository
 {
 
-    public static function getByPerson(Person $person)
+    /**
+     * @param Person $person
+     *
+     * @return StudioAggregate|null
+     */
+    public function getByPerson(Person $person)
     {
         /**
          * @var StudioOwner $studioOwner
          */
-        $studioOwner = StudioOwner::find()
-                                  ->where(['person_id' => $person->id])
-                                  ->one();
+        $studioOwner = StudioOwner::find()->where(['person_id' => $person->id])->one();
         if (!$studioOwner) {
             return null;
         }
-        $studio = $studioOwner->studio;
-        return new StudioAggregate($studio, $studioOwner);
+        return $studioOwner->studio;
     }
 }

@@ -32,8 +32,7 @@ class FB extends Object
 	public function getUser($id)
 	{
 		FacebookSession::setDefaultApplication(self::$config['APPID'], self::$config['SECURITY_KEY']);
-
-		$accessToken = new AccessToken(\yii::$app->cuser->token);
+		$accessToken = \Yii::$app->session->get('USER')->token;
 		$session = new FacebookSession($accessToken);
 		$currentUser = (
 				new FacebookRequest(
