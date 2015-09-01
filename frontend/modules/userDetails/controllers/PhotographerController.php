@@ -1,10 +1,10 @@
 <?php
 namespace app\modules\userDetails\controllers;
 
-use app\modules\factories\StudioFactory;
-use app\modules\repositories\PersonRepository;
-use app\modules\repositories\StudioRepository;
-use app\modules\services\GetPhotographerAggregateService;
+use app\ddd\person\repositories\PersonRepository;
+use app\ddd\person\services\GetPhotographerAggregateService;
+use app\ddd\studio\factories\StudioFactory;
+use app\ddd\studio\repositories\StudioRepository;
 use frontend\models\UserType;
 use yii\filters\AccessControl;
 use yii\web\Controller;

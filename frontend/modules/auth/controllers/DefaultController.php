@@ -1,11 +1,9 @@
 <?php
 namespace frontend\modules\auth\controllers;
 
-use app\modules\factories\PersonFactory;
-use app\modules\repositories\PersonRepository;
+use app\ddd\person\factories\PersonFactory;
+use app\ddd\person\repositories\PersonRepository;
 use frontend\models\User;
-use frontend\models\UserType;
-use frontend\modules\auth\services\UpdateUserDataService;
 use frontend\modules\socials\FB;
 use frontend\modules\socials\fb\FacebookRedirectLoginHelper;
 use frontend\modules\socials\fb\FacebookRequest;
