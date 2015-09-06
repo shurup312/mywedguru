@@ -49,8 +49,8 @@ class BrideFactory
     {
         $bride             = new Person();
         $bride->user_id    = $this->user->id;
-        $bride->first_name = $firstName;
-        $bride->last_name  = $lastName;
+        $bride->firstName = $firstName;
+        $bride->lastName  = $lastName;
         return $bride;
     }
 

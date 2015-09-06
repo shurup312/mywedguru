@@ -2,8 +2,9 @@
 namespace frontend\modules\auth\controllers;
 
 use app\ddd\person\factories\PersonFactory;
-use app\ddd\person\repositories\PersonRepository;
+use frontend\ddd\person\repositories\PersonRepository;
 use frontend\models\User;
+use frontend\modules\auth\forms\PersonForm;
 use frontend\modules\socials\FB;
 use frontend\modules\socials\fb\FacebookRedirectLoginHelper;
 use frontend\modules\socials\fb\FacebookRequest;
@@ -190,19 +191,22 @@ class DefaultController extends Controller
         $userData     = $site->getUser($userSocialID);
         $currentUser  = \Yii::$app->session->get('USER');
         $personRepository = new PersonRepository();
-        if(!$model = $personRepository->getByUser($currentUser)){
-            $personFactory    = (new PersonFactory($currentUser));
-            $model = $personFactory->create($userData->first_name, $userData->last_name);
+        if($model = $personRepository->getById($currentUser->person_id)) {
+            \Yii::$app->response->redirect(URL::toRoute('/userDetails'));
+            \Yii::$app->end();
         }
-        if(!$model->validate('user_id')){
-            \Yii::$app->session->remove('USER');
-            \Yii::$app->response->redirect('/auth');
-        }
-        if ($model->load(\yii::$app->request->post()) && $model->validate() && $personRepository->save($model)) {
-            /**
-             * @var User $currentUser
-             */
+        $model = new PersonForm();
+        $model->first_name = $userData->first_name;
+        $model->last_name = $userData->last_name;
+        if ($model->load(\yii::$app->request->post()) && $model->validate()) {
+            $person = (new PersonFactory())->create();
+            $person->setFirstName($model->first_name);
+            $person->setLastName($model->last_name);
+            $person->setPhone($model->phone);
+            $person->setEmail($model->email);
+            $personRepository->save($person);
             $currentUser->status = User::STATUS_REGISTERED;
+            $currentUser->person_id = $person->id();
             $currentUser->save();
             \yii::$app->user->login($currentUser);
             \yii::$app->session->remove('USER');

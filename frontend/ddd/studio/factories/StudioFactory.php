@@ -14,12 +14,12 @@ use frontend\models\StudioOwner;
 
 class StudioFactory
 {
-    private $person;
-    public function create(Person $person)
+    /**
+     * @return Studio
+     */
+    public function create()
     {
-        $studioOwner = new StudioOwner();
-        $studioOwner->person_id = $person->id;
         $studio = new Studio();
-        return new StudioAggregate($studio, $studioOwner);
+        return $studio;
     }
 }

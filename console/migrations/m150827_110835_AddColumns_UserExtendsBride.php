@@ -20,14 +20,4 @@ class m150827_110835_AddColumns_UserExtendsBride extends Migration
         $this->dropColumn('user_extends_brides', 'date_birth');
         $this->dropColumn('user_extends_brides_history', 'date_birth');
     }
-    /*
-    // Use safeUp/safeDown to run migration code within a transaction
-    public function safeUp()
-    {
-    }
-
-    public function safeDown()
-    {
-    }
-    */
 }

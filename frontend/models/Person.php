@@ -1,79 +1,214 @@
 <?php
 namespace frontend\models;
 
+use app\ddd\Entity;
+use app\modules\valueObjects\Sex;
+use DateTime;
 use Yii;
 
-/**
- * This is the model class for table "person".
- * @property integer $id
- * @property integer $user_id
- * @property string  $first_name
- * @property string  $last_name
- * @property integer $sex
- * @property string  $date_birth
- * @property string  $mob_phone
- * @property string  $phone
- * @property string  $address
- * @property string  $email
- * @property integer $contact_id
- * @property string  $about
- * @property string  $date_created
- * @property string  $date_deleted
- * @property User    $user
- */
-class Person extends \yii\db\ActiveRecord
+class Person extends Entity
 {
+    protected $id;
+    protected $firstName;
+    protected $lastName;
+    protected $sex;
+    protected $dateBirth;
+    protected $mobPhone;
+    protected $phone;
+    protected $address;
+    protected $email;
+    protected $about;
+    protected $studioId;
+    protected $type;
 
     /**
-     * @inheritdoc
+     * @return string
      */
-    public static function tableName()
+    public function studioId()
     {
-        return 'person';
+        return $this->studioId;
+    }
+    /**
+     * @param string $studio_id
+     */
+    public function setStudioId($studio_id)
+    {
+        $this->studioId = $studio_id;
+    }
+    /**
+     * @return int
+     */
+    public function id()
+    {
+        return $this->id;
     }
 
     /**
-     * @inheritdoc
+     * @param $anId
+     *
      */
-    public function rules()
+    public function setId($anId)
     {
-        return [
-            [['user_id'], 'required'],
-            [['user_id', 'sex', 'contact_id'], 'integer'],
-            [['date_birth', 'mob_phone', 'phone', 'address', 'email', 'date_created', 'date_deleted'], 'safe'],
-            [['about'], 'string'],
-            [['first_name', 'last_name'], 'string', 'max' => 32]
-        ];
+        $this->id = $anId;
     }
 
     /**
-     * @inheritdoc
+     * @return string
      */
-    public function attributeLabels()
+    public function firstName()
     {
-        return [
-            'id'           => 'ID',
-            'user_id'      => 'Пользователь',
-            'first_name'   => 'Имя',
-            'last_name'    => 'Фамилия',
-            'sex'          => 'Пол',
-            'date_birth'   => 'Дата рождения',
-            'mob_phone'    => 'Мобильный телефон',
-            'phone'        => 'Домашний телефон',
-            'address'      => 'Адрес',
-            'email'        => 'E-mail',
-            'contact_id'   => 'Контакты',
-            'about'        => 'Обо мне',
-            'date_created' => 'Date Created',
-            'date_deleted' => 'Date Deleted',
-        ];
+        return $this->firstName;
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @param string $firstName
      */
-    public function getUser()
+    public function setFirstName($firstName)
     {
-        return $this->hasOne(User::className(), ['id' => 'user_id']);
+        $this->firstName = $firstName;
+    }
+
+    /**
+     * @return string
+     */
+    public function lastName()
+    {
+        return $this->lastName;
+    }
+
+    /**
+     * @param string $lastName
+     */
+    public function setLastName($lastName)
+    {
+        $this->lastName = $lastName;
+    }
+
+    /**
+     * @return Sex
+     */
+    public function sex()
+    {
+        return $this->sex;
+    }
+
+    /**
+     * @param Sex $sex
+     */
+    public function setSex(Sex $sex)
+    {
+        $this->sex = $sex->type();
+    }
+
+    /**
+     * @return DateTime|null
+     */
+    public function dateBirth()
+    {
+        return $this->dateBirth;
+    }
+
+    /**
+     * @param DateTime $dateBirth
+     */
+    public function setDateBirth(DateTime $dateBirth)
+    {
+        $this->dateBirth = $dateBirth;
+    }
+
+    /**
+     * @return string
+     */
+    public function mobPhone()
+    {
+        return $this->mobPhone;
+    }
+
+    /**
+     * @param string $mobPhone
+     */
+    public function setMobPhone($mobPhone)
+    {
+        $this->mobPhone = $mobPhone;
+    }
+
+    /**
+     * @return string
+     */
+    public function phone()
+    {
+        return $this->phone;
+    }
+
+    /**
+     * @param string $phone
+     */
+    public function setPhone($phone)
+    {
+        $this->phone = $phone;
+    }
+
+    /**
+     * @return string
+     */
+    public function address()
+    {
+        return $this->address;
+    }
+
+    /**
+     * @param string $address
+     */
+    public function setAddress($address)
+    {
+        $this->address = $address;
+    }
+
+    /**
+     * @return string
+     */
+    public function email()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param string $email
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+    }
+
+    /**
+     * @return string
+     */
+    public function about()
+    {
+        return $this->about;
+    }
+
+    /**
+     * @param string $about
+     */
+    public function setAbout($about)
+    {
+        $this->about = $about;
+    }
+
+    /**
+     * @return UserType
+     */
+    public function type()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param UserType $aUserType
+     */
+    public function setType(UserType $aUserType)
+    {
+        $this->type = $aUserType;
     }
 }

@@ -3,52 +3,74 @@ namespace frontend\models;
 
 use Yii;
 
-/**
- * This is the model class for table "studio".
- * @property integer $id
- * @property string  $name
- * @property string  $phone
- * @property string  $address
- * @property string  $date_created
- * @property string  $date_deleted
- */
-class Studio extends \yii\db\ActiveRecord
+class Studio
 {
-
+    private $id;
+    private $name;
+    private $phone;
+    private $address;
     /**
-     * @inheritdoc
+     * @return int
      */
-    public static function tableName()
+    public function id()
     {
-        return 'studio';
+        return $this->id;
     }
 
     /**
-     * @inheritdoc
+     * @param int $id
      */
-    public function rules()
+    public function setId($id)
     {
-        return [
-            [['name'], 'required'],
-            [['date_created', 'date_deleted'], 'safe'],
-            [['name'], 'string', 'max' => 128],
-            [['phone'], 'string', 'max' => 32],
-            [['address'], 'string', 'max' => 255]
-        ];
+        $this->id = $id;
     }
 
     /**
-     * @inheritdoc
+     * @return string
      */
-    public function attributeLabels()
+    public function name()
     {
-        return [
-            'id'           => 'ID',
-            'name'         => 'Название студии',
-            'phone'        => 'Телефон',
-            'address'      => 'Адрес',
-            'date_created' => 'Date Created',
-            'date_deleted' => 'Date Deleted',
-        ];
+        return $this->name;
     }
+
+    /**
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function phone()
+    {
+        return $this->phone;
+    }
+
+    /**
+     * @param string $phone
+     */
+    public function setPhone($phone)
+    {
+        $this->phone = $phone;
+    }
+
+    /**
+     * @return string
+     */
+    public function address()
+    {
+        return $this->address;
+    }
+
+    /**
+     * @param string $address
+     */
+    public function setAddress($address)
+    {
+        $this->address = $address;
+    }
+    
 }

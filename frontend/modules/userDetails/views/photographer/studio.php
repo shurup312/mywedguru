@@ -1,22 +1,22 @@
 <?
 /**
- * @var Studio $studio
+ * @var StudioForm $studioForm
  */
-?>
-<?php use app\modules\entities\Studio;
+use app\modules\userDetails\forms\StudioForm;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 $form = ActiveForm::begin([
     'options' => ['enctype' => 'multipart/form-data', 'method' => 'post', 'role' => 'form'],
 ]); ?>
-<?= $form->field($studio, 'name')
+<?= $form->field($studioForm, 'name')
          ->textInput() ?>
-<?= $form->field($studio, 'phone')
+<?= $form->field($studioForm, 'phone')
          ->textInput() ?>
-<?= $form->field($studio, 'address')
+<?= $form->field($studioForm, 'address')
          ->textInput() ?>
 <div class="form-group">
-    <?= Html::submitButton('Создать группу', ['class' => 'btn btn-success']) ?>
+    <?= Html::submitButton('Создать студию', ['class' => 'btn btn-success']) ?>
+    <?= Html::a('Пропустить', '/cabinet', ['class' => 'btn btn-primary']) ?>
 </div>
 <? ActiveForm::end(); ?>

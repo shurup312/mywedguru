@@ -7,10 +7,11 @@
  */
 namespace frontend\models;
 
-use yii\base\Model;
+use app\ddd\interfaces\exceptions\ObjectValueException;
 
-class UserType extends Model
+class UserType
 {
+    private $type;
 
     const USER_BRIDE = 1;
     const USER_PHOTOGRAPGER = 2;
@@ -18,4 +19,33 @@ class UserType extends Model
         self::USER_BRIDE        => 'bride',
         self::USER_PHOTOGRAPGER => 'photographer',
     ];
+
+    /**
+     * @param integer $aType
+     *
+     * @throws ObjectValueException
+     */
+    public function __construct($aType){
+
+        if(!array_key_exists($aType, self::$prefix)){
+            throw new ObjectValueException();
+        }
+        $this->type = $aType;
+    }
+
+    /**
+     * @return integer
+     */
+    public function type()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @return string
+     */
+    public function prefix()
+    {
+        return self::$prefix[$this->type];
+    }
 }

@@ -73,7 +73,7 @@ class StudioAggregate extends Aggregate
      */
     public function save(StudioRepository $studioRepository)
     {
-        if (!$studioRepository->save($this->root)) {
+        if (!$studioRepository->save($this->studio())) {
             return false;
         }
         if (!$this->studioOwner->studio_id) {

@@ -25,7 +25,7 @@ class Sex
         $this->type = $type;
     }
 
-    public function getPersonSex (){
+    public function type (){
         return $this->type;
     }
 }

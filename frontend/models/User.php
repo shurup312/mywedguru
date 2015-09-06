@@ -8,6 +8,7 @@ use yii\web\IdentityInterface;
 /**
  * This is the model class for table "users".
  * @property integer $id
+ * @property integer $person_id
  * @property integer $site
  * @property string  $socialid
  * @property string  $token
@@ -44,7 +45,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             [['site', 'token'], 'required'],
-            [['site', 'avatar', 'status', 'type'], 'integer'],
+            [['person_id', 'site', 'avatar', 'status', 'type'], 'integer'],
             [['date_created', 'date_deleted'], 'safe'],
             [['socialid'], 'string', 'max' => 64],
         ];

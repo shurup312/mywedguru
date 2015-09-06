@@ -1,12 +1,15 @@
 <?php
 namespace app\modules\userDetails\controllers;
 
-use app\ddd\person\repositories\PersonRepository;
-use app\ddd\person\services\GetPhotographerAggregateService;
-use app\ddd\studio\factories\StudioFactory;
+use app\ddd\person\services\GetPersonService;
 use app\ddd\studio\repositories\StudioRepository;
+use app\ddd\studio\services\CreateStudioByPersonService;
+use app\modules\userDetails\forms\StudioForm;
+use Exception;
+use frontend\ddd\person\repositories\PersonRepository;
 use frontend\models\UserType;
 use yii\filters\AccessControl;
+use yii\helpers\Url;
 use yii\web\Controller;
 
 class PhotographerController extends Controller
@@ -21,7 +24,7 @@ class PhotographerController extends Controller
                     [
                         'allow'         => true,
                         'matchCallback' => function ($rule, $action) {
-                            return \Yii::$app->getUser()->identity->type==UserType::USER_PHOTOGRAPGER;
+                            return \Yii::$app->getUser()->identity->type == UserType::USER_PHOTOGRAPGER;
                         }
                     ],
                 ],
@@ -31,23 +34,27 @@ class PhotographerController extends Controller
 
     public function actionIndex()
     {
-        $service      = new GetPhotographerAggregateService(\Yii::$app->getUser()->identity, new PersonRepository(), new StudioRepository());
-        $photographer = $service->execute();
-        if ($photographer->studioAggregate()!==null) {
-            \Yii::$app->response->redirect('/photographer');
+        $studioRepository = (new StudioRepository());
+        $personRepository = (new PersonRepository());
+        $person           = (new GetPersonService())->execute();
+        $studio           = $studioRepository->getByPerson($person);
+        if ($studio !== null) {
+            \Yii::$app->response->redirect('/cabinet');
             \Yii::$app->end();
         }
-        /**
-         * TODO: сделать форму для студии
-         */
-        $studioAggregate = (new StudioFactory())->create($photographer->root());
-        $studio          = $studioAggregate->root();
-        if ($studio->load(\Yii::$app->request->post()) && $studio->validate()) {
-            $studioAggregate->setStudio($studio);
-            if ($studioAggregate->save(new StudioRepository())) {
-
+        $studioForm = new StudioForm();
+        if ($studioForm->load(\Yii::$app->request->post()) && $studioForm->validate()) {
+            $transaction = \Yii::$app->getDb()->beginTransaction();
+            try {
+                $service = new CreateStudioByPersonService($studioRepository, $personRepository, $studio, $person);
+                $service->execute($studioForm->name, $studioForm->phone, $studioForm->address);
+                $transaction->commit();
+                \Yii::$app->response->redirect(URL::toRoute('/cabinet'));
+            } catch (Exception $e) {
+                $studioForm->addError('name', $e->getMessage());
             }
+            $transaction->rollBack();
         }
-        return $this->render('studio', ['studio' => $studioAggregate->root(),]);
+        return $this->render('studio', ['studioForm' => $studioForm,]);
     }
 }
