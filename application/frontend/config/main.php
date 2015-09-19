@@ -3,7 +3,7 @@ $params = array_merge(require(__DIR__.'/../../common/config/params.php'), requir
     require(__DIR__.'/params.php'), require(__DIR__.'/params-local.php'));
 use \yii\web\Request;
 
-$baseUrl = str_replace('/frontend/web', '', (new Request)->getBaseUrl());
+$baseUrl = str_replace('/application/frontend/web', '', (new Request)->getBaseUrl());
 return [
     'id'                  => 'app-frontend',
     'name'                => 'Школа бортпроводников',
