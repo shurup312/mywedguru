@@ -37,6 +37,8 @@ class IndexAction extends Action
             $groom = $this->getPersonCommandBus()->handle(new CreatePersonCommand($weddingForm->groomFirstName(), $weddingForm->groomLastName()));
             $this->getWeddingCommandBus()->handle(new CreateWeddingCommand($groom, $bride, $weddingForm->date()));
             $transaction->commit();
+            \Yii::$app->response->redirect('/cabinet');
+            \Yii::$app->end();
         }
         return $this->controller->render('wedding', [
             'weddingForm' => $weddingForm,
