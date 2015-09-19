@@ -32,6 +32,6 @@ class UpdatePersonRawHandler
         $person->setEmail($aCommand->email());
         $person->setAddress($aCommand->address());
         $person->setAbout($aCommand->about());
-        return $this->personRepository->save($person);
+        $this->personRepository->save($person);
     }
 }

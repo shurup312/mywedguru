@@ -2,69 +2,64 @@
 
 namespace domain\wedding\entities;
 
+use DateTime;
+
 /**
  * This is the model class for table "wedding".
  *
- * @property integer $id
- * @property integer $groom_id
- * @property integer $bride_id
- * @property string $date_created
- * @property string $date_deleted
- * @property string $date
- *
- * @property Person $groom
- * @property Person $bride
  */
 class Wedding
 {
-    /**
-     * @inheritdoc
-     */
-    public static function tableName()
+
+    private $id;
+    private $groomId;
+    private $brideId;
+    private $date;
+
+    public function __construct($aGroomId, $aBrideId, DateTime $aDate)
     {
-        return 'wedding';
+        $this->groomId = $aGroomId;
+        $this->brideId = $aBrideId;
+        $this->date = $aDate;
     }
 
     /**
-     * @inheritdoc
+     * @param $anId
      */
-    public function rules()
+    public function setId($anId)
     {
-        return [
-            [['groom_id', 'bride_id'], 'required'],
-            [['groom_id', 'bride_id'], 'integer'],
-            [['date_created', 'date_deleted', 'date'], 'safe']
-        ];
+        $this->id = $anId;
+    }
+    /**
+     * @return mixed
+     */
+    public function id()
+    {
+        return $this->id;
     }
 
     /**
-     * @inheritdoc
+     * @return integer
      */
-    public function attributeLabels()
+    public function groomId()
     {
-        return [
-            'id' => 'ID',
-            'groom_id' => 'Жених',
-            'bride_id' => 'Невеста',
-            'date_created' => 'Date Created',
-            'date_deleted' => 'Date Deleted',
-            'date' => 'Дата свадьбы',
-        ];
+        return $this->groomId;
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return mixed
      */
-    public function getGroom()
+    public function brideId()
     {
-        return $this->hasOne(Person::className(), ['id' => 'groom_id']);
+        return $this->brideId;
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return DateTime
      */
-    public function getBride()
+    public function date()
     {
-        return $this->hasOne(Person::className(), ['id' => 'bride_id']);
+        return $this->date;
     }
+
 }

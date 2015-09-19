@@ -140,4 +140,9 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return $this->person_id;
     }
+
+    public function id()
+    {
+        return $this->id;
+    }
 }

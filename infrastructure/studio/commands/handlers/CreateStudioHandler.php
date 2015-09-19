@@ -8,9 +8,9 @@
 namespace infrastructure\studio\commands\handlers;
 
 use domain\common\exceptions\exceptions\ServiceException;
+use domain\studio\components\StudioFactory;
 use infrastructure\person\components\PersonRepository;
 use infrastructure\studio\commands\CreateStudioCommand;
-use infrastructure\studio\components\StudioFactory;
 use infrastructure\studio\components\StudioRepository;
 
 class CreateStudioHandler

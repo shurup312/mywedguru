@@ -5,12 +5,14 @@
  * Date: 12.09.2015
  * Time: 19:16
  */
-namespace app\modules\cabinet\controllers\defaults;
+namespace cabinet\controllers\defaults;
 
-use cabinet\components\Action;
 use cabinet\forms\photographer\PersonForm;
+use domain\person\entities\Person;
+use infrastructure\common\components\CommandBusList;
+use infrastructure\person\commands\GetCurrentPersonCommand;
 use infrastructure\person\commands\UpdatePersonRawCommand;
-use infrastructure\person\components\PersonRepository;
+use yii\base\Action;
 use yii\helpers\Url;
 
 class EditAction extends Action
@@ -18,16 +20,17 @@ class EditAction extends Action
 
     public function run()
     {
-        $person = PersonRepository::getByUser(\Yii::$app->getUser()->identity);
+        /**
+         * @var Person $person
+         */
+        $person = CommandBusList::getPersonCommanBus()->handle(new GetCurrentPersonCommand());
         $model  = new PersonForm();
         $model->setAttributes($person->asArray());
         if ($model->load(\Yii::$app->request->post()) && $model->validate()) {
-            if($this->getPersonCommandBus()->handle(new UpdatePersonRawCommand($person, $model->firstName, $model->lastName, $model->mobPhone, $model->phone,$model->dateBirth,$model->email,$model->address, $model->about))){
-                \Yii::$app->response->redirect(URL::toRoute('index'));
-                \Yii::$app->end();
-            }
-            \Yii::$app->session->setFlash('notice', 'Не удалось сохранить данные');
+            CommandBusList::getPersonCommanBus()->handle(new UpdatePersonRawCommand($person, $model->firstName, $model->lastName, $model->mobPhone, $model->phone,$model->dateBirth,$model->email,$model->address, $model->about));
+            \Yii::$app->response->redirect(URL::toRoute('index'));
+            \Yii::$app->end();
         }
-        return $this->controller->render($person->type()->prefix().'/edit', ['model' => $model,]);
+        return $this->controller->render('edit', ['model' => $model,]);
     }
 }

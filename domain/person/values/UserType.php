@@ -15,9 +15,11 @@ class UserType
 
     const USER_BRIDE = 1;
     const USER_PHOTOGRAPGER = 2;
+    const USER_GROOM = 3;
     public static $prefix = [
         self::USER_BRIDE        => 'bride',
         self::USER_PHOTOGRAPGER => 'photographer',
+        self::USER_GROOM => 'groom',
     ];
 
     /**

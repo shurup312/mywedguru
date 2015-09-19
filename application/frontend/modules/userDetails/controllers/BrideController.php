@@ -1,6 +1,7 @@
 <?php
 namespace userDetails\controllers;
 
+use app\modules\userDetails\controllers\bride\IndexAction;
 use domain\person\values\UserType;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -24,8 +25,10 @@ class BrideController extends Controller
         ];
     }
 
-    public function actionIndex()
+    public function actions()
     {
-        return $this->render('index');
+        return [
+            'index'       => IndexAction::className(),
+        ];
     }
 }

@@ -7,11 +7,13 @@
  */
 namespace userDetails\controllers\photographer;
 
+use domain\person\entities\Person;
 use domain\person\specifications\IsSetStudioSpecification;
 use domain\studio\entities\Studio;
 use Exception;
+use infrastructure\common\components\CommandBusList;
+use infrastructure\person\commands\GetCurrentPersonCommand;
 use infrastructure\person\commands\UpdatePersonCommand;
-use infrastructure\person\components\PersonRepository;
 use infrastructure\studio\commands\CreateStudioCommand;
 use userDetails\components\Action;
 use userDetails\forms\StudioForm;
@@ -22,7 +24,10 @@ class IndexAction extends Action
 
     public function run()
     {
-        $person           = PersonRepository::getByUser(\Yii::$app->getUser()->identity);
+        /**
+         * @var Person $person
+         */
+        $person           = CommandBusList::getPersonCommanBus()->handle(new GetCurrentPersonCommand());
         if (IsSetStudioSpecification::withoutStudio($person)) {
             \Yii::$app->response->redirect('/cabinet');
             \Yii::$app->end();

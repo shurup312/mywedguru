@@ -7,6 +7,19 @@ class Studio
     private $name;
     private $phone;
     private $address;
+
+    /**
+     * @param $aName
+     * @param $aPhone
+     * @param $anAddress
+     */
+    public function __construct($aName, $aPhone, $anAddress)
+    {
+        $this->name = $aName;
+        $this->phone = $aPhone;
+        $this->address = $anAddress;
+    }
+
     /**
      * @return int
      */

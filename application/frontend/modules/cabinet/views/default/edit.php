@@ -5,7 +5,7 @@
  * Date: 27.08.2015
  * Time: 11:53
  */
-use app\modules\cabinet\forms\photographer\PersonForm;
+use cabinet\forms\photographer\PersonForm;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 

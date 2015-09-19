@@ -8,6 +8,7 @@
 namespace infrastructure\studio\components;
 
 use domain\person\entities\Person;
+use domain\studio\components\StudioFactory;
 use domain\studio\entities\Studio;
 use infrastructure\common\components\SqlRepository;
 use yii\db\Query;

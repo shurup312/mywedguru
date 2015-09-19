@@ -1,16 +1,13 @@
 <?php
 namespace cabinet\controllers;
 
-use app\ddd\exceptions\exceptions\ServiceException;
-use app\modules\cabinet\controllers\defaults\EditAction;
-use cabinet\controllers\defaults\IndexAction;
-use infrastructure\common\exceptions\EntityException;
-use app\ddd\person\services\GetPersonService;
-use app\ddd\person\services\SavePersonService;
-use app\ddd\studio\repositories\StudioRepository;
-use app\modules\cabinet\forms\photographer\PersonForm;
-use frontend\ddd\person\repositories\PersonRepository;
-use frontend\models\User;
+use cabinet\controllers\photographer as photographer;
+use cabinet\controllers\bride as bride;
+use cabinet\controllers\defaults as defaults;
+use domain\person\entities\Person;
+use domain\person\values\UserType;
+use infrastructure\common\components\CommandBusList;
+use infrastructure\person\commands\GetCurrentPersonCommand;
 use yii\filters\AccessControl;
 use yii\helpers\Url;
 use yii\web\Controller;
@@ -35,11 +32,24 @@ class DefaultController extends Controller
 
     public function actions()
     {
-        return [
-            'index' => IndexAction::className(),
-            'edit' => EditAction::className(),
-        ];
+        /**
+         * @var Person $person
+         */
+        $person  = CommandBusList::getPersonCommanBus()->handle(new GetCurrentPersonCommand());
+        $actions = [];
+        switch ($person->type()->type()) {
+            case UserType::USER_PHOTOGRAPGER:
+                $actions['index'] = photographer\IndexAction::className();
+                break;
+            case UserType::USER_BRIDE:
+                $actions['index'] = bride\IndexAction::className();
+                break;
+            default:
+                \Yii::$app->getUser()->logout();
+                \Yii::$app->response->redirect(URL::toRoute('/auth'));
+                \Yii::$app->end();
+        }
+        $actions['edit'] = defaults\EditAction::className();
+        return $actions;
     }
-
-
 }

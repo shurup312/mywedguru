@@ -5,3 +5,6 @@
 
 //Person
 \Yii::$container->set('domain\person\contracts\PersonCommandBus', 'infrastructure\person\components\PersonCommandBus');
+
+//Wedding
+\Yii::$container->set('domain\wedding\contracts\WeddingCommandBus', 'infrastructure\wedding\components\WeddingCommandBus');

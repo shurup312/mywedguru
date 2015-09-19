@@ -7,7 +7,8 @@
  */
 namespace infrastructure\studio\commands;
 
-use infrastructure\studio\components\StudioFactory;
+
+use domain\studio\components\StudioFactory;
 
 class CreateStudioCommand
 {
