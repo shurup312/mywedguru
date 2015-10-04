@@ -29,7 +29,7 @@ class IndexAction extends Action
          */
         $person           = CommandBusList::getPersonCommanBus()->handle(new GetCurrentPersonCommand());
         if (IsSetStudioSpecification::withoutStudio($person)) {
-            \Yii::$app->response->redirect('/cabinet');
+            \Yii::$app->response->redirect(URL::toRoute('/cabinet/'.$person->user()->slug()));
             \Yii::$app->end();
         }
         $studioForm = new StudioForm();

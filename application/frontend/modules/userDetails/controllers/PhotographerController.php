@@ -21,7 +21,7 @@ class PhotographerController extends Controller
                         'allow'         => true,
                         'matchCallback' => function ($rule, $action) {
                             $person = PersonRepository::getByUser(\Yii::$app->getUser()->identity);
-                            return $person && $person->type()->type() == UserType::USER_PHOTOGRAPGER;
+                            return $person && $person->user()->type()->type() == UserType::USER_PHOTOGRAPGER;
                         }
                     ],
                 ],

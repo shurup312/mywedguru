@@ -8,7 +8,6 @@
 namespace app\modules\userDetails\controllers\bride;
 
 use domain\person\entities\Person;
-use domain\person\values\UserType;
 use domain\wedding\entities\Wedding;
 use infrastructure\person\commands\GetCurrentPersonCommand;
 use infrastructure\person\commands\CreatePersonCommand;
@@ -16,6 +15,7 @@ use infrastructure\wedding\commands\CreateWeddingCommand;
 use infrastructure\wedding\components\WeddingRepository;
 use userDetails\components\Action;
 use userDetails\forms\WeddingForm;
+use yii\helpers\Url;
 
 class IndexAction extends Action
 {
@@ -25,19 +25,21 @@ class IndexAction extends Action
         /**
          * @var Person $bride
          */
-        $bride   = $this->getPersonCommandBus()->handle(new GetCurrentPersonCommand());
-        $wedding = WeddingRepository::getByBride($bride);
+        $bride      = $this->getPersonCommandBus()->handle(new GetCurrentPersonCommand());
+        $wedding    = WeddingRepository::getByBride($bride);
+        $cabinetURL = URL::toRoute('/cabinet/'.$bride->user()->slug());
         if ($wedding instanceof Wedding) {
-            \Yii::$app->response->redirect('/cabinet');
+            \Yii::$app->response->redirect($cabinetURL);
             \Yii::$app->end();
         }
         $weddingForm = new WeddingForm();
         if ($weddingForm->load(\Yii::$app->getRequest()->post()) && $weddingForm->validate()) {
             $transaction = \Yii::$app->getDb()->beginTransaction();
-            $groom = $this->getPersonCommandBus()->handle(new CreatePersonCommand($weddingForm->groomFirstName(), $weddingForm->groomLastName()));
+            $groom       = $this->getPersonCommandBus()->handle(new CreatePersonCommand($weddingForm->groomFirstName(),
+                $weddingForm->groomLastName()));
             $this->getWeddingCommandBus()->handle(new CreateWeddingCommand($groom, $bride, $weddingForm->date()));
             $transaction->commit();
-            \Yii::$app->response->redirect('/cabinet');
+            \Yii::$app->response->redirect($cabinetURL);
             \Yii::$app->end();
         }
         return $this->controller->render('wedding', [

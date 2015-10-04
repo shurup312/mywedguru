@@ -2,6 +2,7 @@
 namespace auth\controllers;
 
 use domain\person\components\PersonFactory;
+use domain\person\values\Slug;
 use frontend\modules\auth\forms\PersonForm;
 use frontend\modules\socials\FB;
 use frontend\modules\socials\fb\FacebookRedirectLoginHelper;
@@ -14,6 +15,7 @@ use frontend\modules\socials\VK;
 use infrastructure\person\components\PersonRepository;
 use infrastructure\person\entities\User;
 use yii\db\Exception;
+use yii\helpers\Inflector;
 use yii\helpers\Url;
 use yii\web\Controller;
 
@@ -45,12 +47,10 @@ class DefaultController extends Controller
         if (!$userData->access_token) {
             \yii::$app->response->redirect('/auth');
         }
-        $user = User::find()
-                    ->where([
-                        'site'     => User::SITE_VK,
-                        'socialid' => $userData->user_id
-                    ])
-                    ->one();
+        $user = User::find()->where([
+            'site'     => User::SITE_VK,
+            'socialid' => $userData->user_id
+        ])->one();
         if (!$user) {
             $user           = new User();
             $user->site     = User::SITE_VK;
@@ -85,12 +85,10 @@ class DefaultController extends Controller
         if (!isset($currentUser->uid)) {
             \yii::$app->response->redirect('/auth');
         }
-        $user = User::find()
-                    ->where([
-                        'site'     => User::SITE_OK,
-                        'socialid' => $currentUser->uid
-                    ])
-                    ->one();
+        $user = User::find()->where([
+            'site'     => User::SITE_OK,
+            'socialid' => $currentUser->uid
+        ])->one();
         if (!$user) {
             $user           = new User();
             $user->site     = User::SITE_OK;
@@ -125,17 +123,14 @@ class DefaultController extends Controller
         if (!isset($session)) {
             \yii::$app->response->redirect(\yii::$app->params['loginURL']);
         }
-        $currentUser = (new FacebookRequest($session, 'GET', '/me'))->execute()
-                                                                    ->getGraphObject(GraphUser::className());
+        $currentUser = (new FacebookRequest($session, 'GET', '/me'))->execute()->getGraphObject(GraphUser::className());
         if (is_null($currentUser->getId())) {
             \yii::$app->response->redirect('/auth');
         }
-        $user = User::find()
-                    ->where([
-                        'site'     => User::SITE_FB,
-                        'socialid' => $currentUser->getId()
-                    ])
-                    ->one();
+        $user = User::find()->where([
+            'site'     => User::SITE_FB,
+            'socialid' => $currentUser->getId()
+        ])->one();
         if (!$user) {
             $user           = new User();
             $user->site     = User::SITE_FB;
@@ -158,7 +153,7 @@ class DefaultController extends Controller
     {
         $this->validateSocialNetwork();
         $userType = \Yii::$app->session->get('USER')->type;
-        if ($userType && \Yii::$app->session->get('USER')->status==User::STATUS_REGISTERED) {
+        if ($userType && \Yii::$app->session->get('USER')->status == User::STATUS_REGISTERED) {
             \Yii::$app->response->redirect('/auth/step1/'.$userType);
             \Yii::$app->end();
         }
@@ -172,7 +167,7 @@ class DefaultController extends Controller
             \yii::$app->response->redirect('/auth');
         }
         $registrationUser = \Yii::$app->session->get('USER');
-        if ($registrationUser->type && $registrationUser->status==User::STATUS_REGISTERED) {
+        if ($registrationUser->type && $registrationUser->status == User::STATUS_REGISTERED) {
             \yii::$app->response->redirect('/auth/step2');
         }
         $currentUser       = $registrationUser;
@@ -186,18 +181,18 @@ class DefaultController extends Controller
     {
         $this->validateSocialNetwork();
         $this->validateRegistrationStep();
-        $site         = $this->getSocialNetwork();
-        $userSocialID = \Yii::$app->session->get('USER')->socialid;
-        $userData     = $site->getUser($userSocialID);
-        $currentUser  = \Yii::$app->session->get('USER');
+        $site             = $this->getSocialNetwork();
+        $userSocialID     = \Yii::$app->session->get('USER')->socialid;
+        $userData         = $site->getUser($userSocialID);
+        $currentUser      = \Yii::$app->session->get('USER');
         $personRepository = new PersonRepository();
-        if($model = $personRepository->getById($currentUser->person_id)) {
+        if ($model = $personRepository->getById($currentUser->person_id)) {
             \Yii::$app->response->redirect(URL::toRoute('/userDetails'));
             \Yii::$app->end();
         }
-        $model = new PersonForm();
+        $model             = new PersonForm();
         $model->first_name = $userData->first_name;
-        $model->last_name = $userData->last_name;
+        $model->last_name  = $userData->last_name;
         if ($model->load(\yii::$app->request->post()) && $model->validate()) {
             $person = (new PersonFactory())->createEmpty();
             $person->setFirstName($model->first_name);
@@ -205,8 +200,11 @@ class DefaultController extends Controller
             $person->setPhone($model->phone);
             $person->setEmail($model->email);
             $personRepository->save($person);
-            $currentUser->status = User::STATUS_REGISTERED;
+            $currentUser->status    = User::STATUS_REGISTERED;
             $currentUser->person_id = $person->id();
+            $slug                   = new Slug();
+            $slug->createForPerson($person);
+            $currentUser->slug = $slug->value();
             $currentUser->save();
             \yii::$app->user->login($currentUser);
             \yii::$app->session->remove('USER');
@@ -232,7 +230,7 @@ class DefaultController extends Controller
 
     protected function validateRegistrationStep()
     {
-        if (\Yii::$app->session->get('USER')->status==User::STATUS_REGISTERED) {
+        if (\Yii::$app->session->get('USER')->status == User::STATUS_REGISTERED) {
             \yii::$app->user->login(\Yii::$app->session->get('USER'));
             \Yii::$app->session->remove('USER');
             \yii::$app->response->redirect(URL::toRoute('/userDetails'));

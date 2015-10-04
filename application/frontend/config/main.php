@@ -48,7 +48,9 @@ return [
             'rules'           => [
                 'auth/step1/<userType:\d+>' => 'auth/default/step1',
                 'auth/<value:\w+>'          => 'auth/default/<value>',
-
+                'cabinet/edit'      => 'cabinet/default/edit',
+                'cabinet/default/edit'      => 'cabinet/default/edit',
+                'cabinet/<slug:\S+>'        => 'cabinet/default/index',
             ],
         ],
     ],

@@ -21,6 +21,11 @@ class UserType
         self::USER_PHOTOGRAPGER => 'photographer',
         self::USER_GROOM => 'groom',
     ];
+    public static $typeName = [
+        self::USER_BRIDE        => 'Невеста',
+        self::USER_PHOTOGRAPGER => 'Фотограф',
+        self::USER_GROOM => 'Жених',
+    ];
 
     /**
      * @param integer $aType
@@ -49,5 +54,10 @@ class UserType
     public function prefix()
     {
         return self::$prefix[$this->type];
+    }
+
+    public function name()
+    {
+        return self::$typeName[$this->type];
     }
 }

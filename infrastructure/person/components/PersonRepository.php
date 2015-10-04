@@ -8,11 +8,10 @@
 namespace infrastructure\person\components;
 
 use DateTime;
-use domain\common\exceptions\exceptions\SqlRepositoryException;
+use domain\common\exceptions\SqlRepositoryException;
 use domain\person\components\PersonFactory;
 use domain\person\entities\Person;
 use domain\person\values\Sex;
-use domain\person\values\UserType;
 use infrastructure\common\components\SqlRepository;
 use infrastructure\person\entities\User;
 use yii\db\Query;
@@ -21,6 +20,36 @@ class PersonRepository extends SqlRepository
 {
 
     private static $tableName = '{{%person}}';
+
+    public static function getBySlug($aSlug)
+    {
+        if (!$aSlug) {
+            return null;
+        }
+        $data = (new Query())->select('person.*')->from(self::$tableName.' as person')->where(['users.slug' => $aSlug])
+            ->innerJoin('{{%users}} as users', 'users.person_id = person.id')->one();
+        if(!$data){
+            return null;
+        }
+        $person = (new PersonFactory())->createEmpty();
+
+        $person->setId($data['id']);
+        $person->setFirstName($data['first_name']);
+        $person->setLastName($data['last_name']);
+        if ($data['sex']) {
+            $person->setSex(new Sex($data['sex']));
+        }
+        if($data['date_birth']){
+            $person->setDateBirth(new DateTime($data['date_birth']));
+        }
+        $person->setMobPhone($data['mob_phone']);
+        $person->setPhone($data['phone']);
+        $person->setAddress($data['address']);
+        $person->setEmail($data['email']);
+        $person->setAbout($data['about']);
+        $person->setStudioId($data['studio_id']);
+        return $person;
+    }
 
     /**
      * @param Person $aPerson
@@ -46,8 +75,10 @@ class PersonRepository extends SqlRepository
         if (!$aPersonId) {
             return null;
         }
-        $data = (new Query())->select('person.*, users.type')->from(self::$tableName.' as person')->where(['person.id' => $aPersonId])
-            ->leftJoin('{{%users}} as users', 'users.person_id = person.id')->one();
+        $data = (new Query())->select('person.*')->from(self::$tableName.' as person')->where(['person.id' => $aPersonId])->one();
+        if(!$data){
+            return null;
+        }
         $person = (new PersonFactory())->createEmpty();
         $person->setId($data['id']);
         $person->setFirstName($data['first_name']);
@@ -64,9 +95,6 @@ class PersonRepository extends SqlRepository
         $person->setEmail($data['email']);
         $person->setAbout($data['about']);
         $person->setStudioId($data['studio_id']);
-        if($data['type']){
-            $person->setType(new UserType($data['type']));
-        }
         return $person;
     }
 
@@ -111,6 +139,10 @@ class PersonRepository extends SqlRepository
             throw new SqlRepositoryException('Не передан обязательный параметр для получения персоны.');
         }
         return (new self())->getByID($aUser->personId());
+    }
 
+    public function getUserByPerson(Person $aPerson)
+    {
+        return User::find()->where(['person_id'=>$aPerson->id()])->one();
     }
 }

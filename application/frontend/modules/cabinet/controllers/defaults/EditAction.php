@@ -17,7 +17,6 @@ use yii\helpers\Url;
 
 class EditAction extends Action
 {
-
     public function run()
     {
         /**

@@ -5,18 +5,24 @@
  * Date: 27.08.2015
  * Time: 11:53
  */
-use frontend\models\Person;
-use frontend\models\Studio;
+use domain\person\entities\Person;
+use domain\studio\entities\Studio;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
 /**
  * @var Person $person
  * @var Studio $studio
+ * @var boolean $isOwner
  */
 ?>
+<?=$person->user()->type()->name();?>
 <h3><?= $person->lastName(); ?> <?= $person->firstName(); ?></h3>
-<?=HTML::a('Именить личные данные',[URL::toRoute('edit')],['class'=>'btn btn-info pull-right']);?>
+<?php
+if($isOwner){
+    echo HTML::a('Именить личные данные',[URL::toRoute('edit')],['class'=>'btn btn-info pull-right']);
+}
+?>
 <h4>О себе</h4>
 <?= $person->about()?$person->about():'пусто'; ?>
 <h4>E-mail</h4>

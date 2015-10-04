@@ -18,19 +18,23 @@ use yii\base\Action;
 class IndexAction extends Action
 {
 
-    public function run()
+    public function run($slug)
     {
+
         /**
          * @var Person  $bride
          * @var Wedding $wedding
          */
-        $bride   = CommandBusList::getPersonCommanBus()->handle(new GetCurrentPersonCommand());
-        $wedding = WeddingRepository::getByBride($bride);
-        $groom   = PersonRepository::getById($wedding->groomId());
-        return $this->controller->render($bride->type()->prefix().'/index', [
-            'bride' => $bride,
-            'studio' => $wedding,
-            'groom'  => $groom,
+        $personBySlug = PersonRepository::getBySlug($slug);
+        $bride        = CommandBusList::getPersonCommanBus()->handle(new GetCurrentPersonCommand());
+        $wedding      = WeddingRepository::getByBride($personBySlug);
+        $groom        = PersonRepository::getById($wedding->groomId());
+        $isOwner = $bride->equalsTo($personBySlug);
+        return $this->controller->render($bride->user()->type()->prefix().'/index', [
+            'bride'   => $personBySlug,
+            'wedding' => $wedding,
+            'groom'   => $groom,
+            'isOwner' => $isOwner,
         ]);
     }
 }

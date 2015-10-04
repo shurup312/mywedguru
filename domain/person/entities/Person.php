@@ -4,8 +4,16 @@ namespace domain\person\entities;
 use DateTime;
 use domain\common\components\Entity;
 use domain\person\values\Sex;
-use domain\person\values\UserType;
+use infrastructure\person\components\PersonRepository;
+use infrastructure\person\entities\User;
 
+/**
+ * Class Person
+ *
+ * @package domain\person\entities
+ *
+ * @property User $user
+ */
 class Person extends Entity
 {
     protected $id;
@@ -19,7 +27,7 @@ class Person extends Entity
     protected $email;
     protected $about;
     protected $studioId;
-    protected $type;
+    private $user;
 
     /**
      * @return string
@@ -197,18 +205,19 @@ class Person extends Entity
     }
 
     /**
-     * @return UserType
+     * @return User
      */
-    public function type()
+    public function user()
     {
-        return $this->type;
+        if(!$this->user){
+            $this->user = (new PersonRepository())->getUserByPerson($this);
+        }
+
+        return $this->user;
     }
 
-    /**
-     * @param UserType $aUserType
-     */
-    public function setType(UserType $aUserType)
+    public function equalsTo(Person $aPerson)
     {
-        $this->type = $aUserType;
+        return $this->id() === $aPerson->id();
     }
 }

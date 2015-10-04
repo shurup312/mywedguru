@@ -1,12 +1,14 @@
 <?php
 namespace infrastructure\person\entities;
 
+use domain\person\values\UserType;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 
 /**
  * This is the model class for table "users".
+ *
  * @property integer $id
  * @property integer $person_id
  * @property integer $site
@@ -17,6 +19,7 @@ use yii\web\IdentityInterface;
  * @property string  $avatar
  * @property string  $date_created
  * @property string  $date_deleted
+ * @property string  $slug
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -48,6 +51,7 @@ class User extends ActiveRecord implements IdentityInterface
             [['person_id', 'site', 'avatar', 'status', 'type'], 'integer'],
             [['date_created', 'date_deleted'], 'safe'],
             [['socialid'], 'string', 'max' => 64],
+            [['slug'], 'string', 'max' => 128],
         ];
     }
 
@@ -66,6 +70,7 @@ class User extends ActiveRecord implements IdentityInterface
             'type'         => 'Тип пользователя',
             'date_created' => 'Date Created',
             'date_deleted' => 'Date Deleted',
+            'slug'         => 'Semantic URL',
         ];
     }
 
@@ -101,6 +106,7 @@ class User extends ActiveRecord implements IdentityInterface
 
     /**
      * Returns an ID that can uniquely identify a user identity.
+     *
      * @return string|integer an ID that uniquely identifies a user identity.
      */
     public function getId()
@@ -114,6 +120,7 @@ class User extends ActiveRecord implements IdentityInterface
      * so that it can be used to check the validity of the user identity.
      * The space of such keys should be big enough to defeat potential identity attacks.
      * This is required if [[User::enableAutoLogin]] is enabled.
+     *
      * @return string a key that is used to check the validity of a given identity ID.
      * @see validateAuthKey()
      */
@@ -144,5 +151,19 @@ class User extends ActiveRecord implements IdentityInterface
     public function id()
     {
         return $this->id;
+    }
+
+    public function slug()
+    {
+        return $this->slug;
+    }
+
+    public function type()
+    {
+        $type = $this->type;
+        if(!($this->type instanceof UserType)){
+            $type = new UserType($this->type);
+        }
+        return $type;
     }
 }

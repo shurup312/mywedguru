@@ -14,10 +14,18 @@ use yii\helpers\Url;
  * @var Person $bride
  * @var Person $groom
  * @var Wedding $wedding
+ * @var boolean $isOwner
  */
 ?>
+<?=$bride->user()->type()->name();?>
 <h3><?= $bride->lastName(); ?> <?= $bride->firstName(); ?></h3>
-<?=HTML::a('Именить личные данные',[URL::toRoute('edit')],['class'=>'btn btn-info pull-right']);?>
+<?php
+if($isOwner){
+    echo HTML::a('Именить личные данные',[URL::toRoute('edit')],['class'=>'btn btn-info pull-right']);
+}
+?>
+<h4>Дата свадьбы</h4>
+<?= $wedding->date()?\Yii::$app->formatter->asDate($wedding->date()):'пусто'; ?>
 <h4>Жених</h4>
 <?= $groom->lastName(); ?> <?=$groom->firstName();?>
 <h4>О себе</h4>
