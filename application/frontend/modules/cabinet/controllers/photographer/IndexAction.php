@@ -11,6 +11,7 @@ use domain\person\entities\Person;
 use infrastructure\common\components\CommandBusList;
 use infrastructure\person\commands\GetCurrentPersonCommand;
 use infrastructure\person\components\PersonRepository;
+use infrastructure\service\commands\GetServicesByUserTypeCommand;
 use infrastructure\studio\components\StudioRepository;
 use yii\base\Action;
 use yii\helpers\Url;
@@ -27,9 +28,12 @@ class IndexAction extends Action
         $person       = CommandBusList::getPersonCommanBus()->handle(new GetCurrentPersonCommand());
         $studio       = StudioRepository::getByPerson($person);
         $personBySlug = PersonRepository::getBySlug($slug);
-
-        $isOwner = $person->equalsTo($personBySlug);
-        return $this->controller->render($personBySlug->user()->type()->prefix().'/index',
-            ['person' => $personBySlug, 'studio' => $studio, 'isOwner' => $isOwner]);
+        $isOwner      = $person->equalsTo($personBySlug);
+        return $this->controller->render($personBySlug->user()->type()->prefix().'/index', [
+            'controller' => $this->controller,
+            'person'      => $personBySlug,
+            'studio'      => $studio,
+            'isOwner'     => $isOwner,
+        ]);
     }
 }

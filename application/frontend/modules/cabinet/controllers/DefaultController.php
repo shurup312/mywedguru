@@ -35,9 +35,10 @@ class DefaultController extends Controller
         /**
          * @var Person $person
          */
-        $actions          = [];
-        $actions['index'] = defaults\IndexAction::className();
-        $actions['edit']  = defaults\EditAction::className();
+        $actions              = [];
+        $actions['index']     = defaults\IndexAction::className();
+        $actions['edit']      = defaults\EditAction::className();
+        $actions['save-price'] = photographer\SavePriceAction::className();
         return $actions;
     }
 }

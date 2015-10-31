@@ -6,36 +6,33 @@
  * Time: 11:53
  */
 use domain\person\entities\Person;
+use domain\service\entities\Service;
 use domain\studio\entities\Studio;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\widgets\Pjax;
 
 /**
- * @var Person $person
- * @var Studio $studio
- * @var boolean $isOwner
+ * @var Person     $person
+ * @var Studio     $studio
+ * @var boolean    $isOwner
+ * @var Service[]  $serviceList
+ * @var array      $hoursArray
+ * @var yii\base\Controller $controller
  */
 ?>
-<?=$person->user()->type()->name();?>
-<h3><?= $person->lastName(); ?> <?= $person->firstName(); ?></h3>
-<?php
-if($isOwner){
-    echo HTML::a('Именить личные данные',[URL::toRoute('edit')],['class'=>'btn btn-info pull-right']);
-}
-?>
-<h4>О себе</h4>
-<?= $person->about()?$person->about():'пусто'; ?>
-<h4>E-mail</h4>
-<?= $person->email()?$person->email():'пусто'; ?>
-<h4>Адрес</h4>
-<?= $person->address()?$person->address():'пусто'; ?>
-<h4>Мобильный телефон</h4>
-<?= $person->mobPhone()?$person->mobPhone():'пусто'; ?>
-<h4>Телефон</h4>
-<?= $person->phone()?$person->phone():'пусто'; ?>
-<h4>Дата рождения</h4>
-<?= $person->dateBirth()?\Yii::$app->formatter->asDate($person->dateBirth()):'пусто'; ?>
-<? if($studio): ?>
-    <h4>Студия</h4>
-    <?= $studio->name(); ?>
-<? endif ;?>
+<?= $person->user()->type()->name(); ?>
+<h3>
+    <?= $person->lastName(); ?> <?= $person->firstName(); ?>
+    <?php
+    if ($isOwner) {
+        echo HTML::a('Именить личные данные', [URL::toRoute('edit')], ['class' => 'btn btn-info']);
+    }
+    ?>
+</h3>
+
+<?= $this->render('_profile', ['person' => $person, 'studio' => $studio]) ?>
+
+<?php Pjax::begin(['enablePushState' => false]); ?>
+<?= (new \cabinet\controllers\photographer\SavePriceAction('save-price', $controller))->run(); ?>
+<?php Pjax::end(); ?>

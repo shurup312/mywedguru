@@ -23,11 +23,14 @@ class EditAction extends Action
          * @var Person $person
          */
         $person = CommandBusList::getPersonCommanBus()->handle(new GetCurrentPersonCommand());
+        /**
+         * @var Person $person
+         */
         $model  = new PersonForm();
         $model->setAttributes($person->asArray());
         if ($model->load(\Yii::$app->request->post()) && $model->validate()) {
             CommandBusList::getPersonCommanBus()->handle(new UpdatePersonRawCommand($person, $model->firstName, $model->lastName, $model->mobPhone, $model->phone,$model->dateBirth,$model->email,$model->address, $model->about));
-            \Yii::$app->response->redirect(URL::toRoute('index'));
+            \Yii::$app->response->redirect(URL::to($person->user()->slug()));
             \Yii::$app->end();
         }
         return $this->controller->render('edit', ['model' => $model,]);

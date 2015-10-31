@@ -30,6 +30,10 @@ class CommandBusList
     {
         return \Yii::$container->get('domain\person\contracts\PersonCommandBus');
     }
+    public static function getServiceCommanBus()
+    {
+        return \Yii::$container->get('domain\service\contracts\ServiceCommandBus');
+    }
     /**
      * @return WeddingCommandBus
      * @throws \yii\base\InvalidConfigException
@@ -37,5 +41,10 @@ class CommandBusList
     public static function getWeddingCommanBus()
     {
         return \Yii::$container->get('domain\wedding\contracts\WeddingCommandBus');
+    }
+
+    public static function getPriceCommandBud()
+    {
+        return \Yii::$container->get('domain\price\contracts\PriceCommandBus');
     }
 }

@@ -204,6 +204,10 @@ class DefaultController extends Controller
             $currentUser->person_id = $person->id();
             $slug                   = new Slug();
             $slug->createForPerson($person);
+            while(PersonRepository::getBySlug($slug->value())){
+                $slug->setValue($slug->value().substr(time(),-1,1));
+            }
+
             $currentUser->slug = $slug->value();
             $currentUser->save();
             \yii::$app->user->login($currentUser);

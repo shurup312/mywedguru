@@ -20,14 +20,4 @@ class m150830_084922_AlterTable_Users extends Migration
         $this->dropColumn('users', 'image_id');
         $this->dropColumn('users', 'person_id');
     }
-    /*
-    // Use safeUp/safeDown to run migration code within a transaction
-    public function safeUp()
-    {
-    }
-
-    public function safeDown()
-    {
-    }
-    */
 }

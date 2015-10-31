@@ -21,6 +21,11 @@ class PersonRepository extends SqlRepository
 
     private static $tableName = '{{%person}}';
 
+    /**
+     * @param $aSlug
+     *
+     * @return Person|null
+     */
     public static function getBySlug($aSlug)
     {
         if (!$aSlug) {
@@ -59,9 +64,9 @@ class PersonRepository extends SqlRepository
     public function save(Person $aPerson)
     {
         if (!$aPerson->id()) {
-            return $this->create($aPerson);
+            $this->create($aPerson);
         } else {
-            return $this->update($aPerson);
+            $this->update($aPerson);
         }
     }
 
